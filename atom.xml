@@ -5,9 +5,9 @@
   
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
+  <link href="https://lingdage.com/"/>
   <updated>2019-01-18T14:02:26.454Z</updated>
-  <id>http://yoursite.com/</id>
+  <id>https://lingdage.com/</id>
   
   <author>
     <name>lingdage</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>计划2019</title>
-    <link href="http://yoursite.com/posts/397a8e26.html"/>
-    <id>http://yoursite.com/posts/397a8e26.html</id>
+    <link href="https://lingdage.com/posts/397a8e26.html"/>
+    <id>https://lingdage.com/posts/397a8e26.html</id>
     <published>2019-01-18T06:03:24.000Z</published>
     <updated>2019-01-18T14:02:26.454Z</updated>
     
@@ -32,12 +32,12 @@
     
     </summary>
     
-      <category term="生活随笔" scheme="http://yoursite.com/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/"/>
+      <category term="生活随笔" scheme="https://lingdage.com/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/"/>
     
     
-      <category term="生活随笔" scheme="http://yoursite.com/tags/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/"/>
+      <category term="生活随笔" scheme="https://lingdage.com/tags/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/"/>
     
-      <category term="计划" scheme="http://yoursite.com/tags/%E8%AE%A1%E5%88%92/"/>
+      <category term="计划" scheme="https://lingdage.com/tags/%E8%AE%A1%E5%88%92/"/>
     
   </entry>
   
