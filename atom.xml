@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://lingdage.com/"/>
-  <updated>2019-01-22T04:53:55.151Z</updated>
+  <updated>2019-02-28T06:13:54.854Z</updated>
   <id>https://lingdage.com/</id>
   
   <author>
@@ -17,11 +17,40 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>how to read android framework source code in android studio</title>
+    <link href="https://lingdage.com/posts/ca9841f5.html"/>
+    <id>https://lingdage.com/posts/ca9841f5.html</id>
+    <published>2019-02-28T05:25:24.000Z</published>
+    <updated>2019-02-28T06:13:54.854Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文将记录最快捷的将framework层源码导入android studio进行源码分析的方法</p><ul><li><p>获取framework源码，这里使用清华大学的<a href="https://mirror.tuna.tsinghua.edu.cn/help/AOSP/" target="_blank" rel="noopener">镜像</a></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/WorkSpace/AOSP</span><br><span class="line">cd ~/WorkSpace/AOSP</span><br><span class="line">git clone -b android-9.0.0_r1 https://aosp.tuna.tsinghua.edu.cn/platform/frameworks/base platform/frameworks/ --depth 1</span><br></pre></td></tr></table></figure></li><li><p>新建out文件夹 和 frameworks 同级</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ~/WorkSpace/AOSP/platform/frameworks</span><br><span class="line">mkdir -p ./out/host/linux-x86/framework</span><br></pre></td></tr></table></figure></li><li><p>获取idegen.jar 并复制到 out/host/linux-x86/framework  下<br><a href="how-to-read-android-framework-source-code-in-android-studio/idegen.jar">idegen.jar</a></p></li><li><p>获取idegen.sh </p><ul><li><p>clone development 到本地</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https://aosp.tuna.tsinghua.edu.cn/platform/development platform/development platform/</span><br><span class="line">development/tools/idegen/idegen.sh</span><br></pre></td></tr></table></figure></li><li><p>或直接选择别人下好的idegen.sh<br><a href="how-to-read-android-framework-source-code-in-android-studio/idegen.sh">idegen.sh</a><br>执行idegen.sh将会在～/WorkSpace/AOSP/platform/ 下生成android.iml 和 android.ipr 文件</p></li></ul></li><li>打开android studio 选择android.ipr 导入工程即可</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;本文将记录最快捷的将framework层源码导入android studio进行源码分析的方法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;获取framework源码，这里使用清华大学的&lt;a href=&quot;https://mirror.tuna.tsinghua.edu.cn/help/
+      
+    
+    </summary>
+    
+      <category term="技术随笔" scheme="https://lingdage.com/categories/%E6%8A%80%E6%9C%AF%E9%9A%8F%E7%AC%94/"/>
+    
+    
+      <category term="AOSP" scheme="https://lingdage.com/tags/AOSP/"/>
+    
+      <category term="源码" scheme="https://lingdage.com/tags/%E6%BA%90%E7%A0%81/"/>
+    
+  </entry>
+  
+  <entry>
     <title>计划2019</title>
     <link href="https://lingdage.com/posts/397a8e26.html"/>
     <id>https://lingdage.com/posts/397a8e26.html</id>
     <published>2019-01-18T06:03:24.000Z</published>
-    <updated>2019-01-22T04:53:55.151Z</updated>
+    <updated>2019-01-23T08:30:40.248Z</updated>
     
     <content type="html"><![CDATA[<p> 　　2015年12月入职的，一直在这家公司，时光如白驹过隙，一晃3年就过去了，从来没有好好静下心来回头看看。今年结了婚，有了十一，压力一下子大了一个级别，生活也瞬间过得捉襟见肘的。3年过去，自己的能力明显没有达到自己的期望，在公司这3年，怎么说呢，虽然不说虚度，但至少没有自己想象的那么努力，技术上广度我自认为还是可以的，深度就不行了，杂而不精。</p><p><img src="/posts/397a8e26/01-big.jpg" alt="01"></p><p>　　希望今年不再碌碌无为，能有个质变。</p><a id="more"></a><hr><p>　　2019年要努力达成的目标 ： </p><ul><li style="list-style: none"><input type="checkbox"> 长10斤肉</li><li style="list-style: none"><input type="checkbox"> 早睡早起</li><li style="list-style: none"><input type="checkbox"> 每周至少运动2次</li><li style="list-style: none"><input type="checkbox"> 精读至少10本技术书</li><li style="list-style: none"><input type="checkbox"> 尽量阅读英文文档</li><li style="list-style: none"><input type="checkbox"> 产出至少10篇技术博客，3篇非技术博客</li><li style="list-style: none"><input type="checkbox"> 开源至少1个<a href="http://www.google.com/" target="_blank" rel="noopener">项目</a></li><li style="list-style: none"><input type="checkbox"> Android常见组件以及目前流行框架源码至少都过一遍</li><li style="list-style: none"><input type="checkbox"> 参加至少1次技术沙龙</li><li style="list-style: none"><input type="checkbox"> 有机会去北上广深杭感受下</li><li style="list-style: none"><input type="checkbox"> 学会Kotlin/Flutter 并投入生产</li><li style="list-style: none"><input type="checkbox"> 了解，并初步使用Go</li><li style="list-style: none"><input type="checkbox"> 简单学习一些shell编程</li><li style="list-style: none"><input type="checkbox"> 工资翻一番</li></ul>]]></content>
     

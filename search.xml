@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[how to read android framework source code in android studio]]></title>
+    <url>%2Fposts%2Fca9841f5.html</url>
+    <content type="text"><![CDATA[本文将记录最快捷的将framework层源码导入android studio进行源码分析的方法 获取framework源码，这里使用清华大学的镜像 123mkdir ~/WorkSpace/AOSPcd ~/WorkSpace/AOSPgit clone -b android-9.0.0_r1 https://aosp.tuna.tsinghua.edu.cn/platform/frameworks/base platform/frameworks/ --depth 1 新建out文件夹 和 frameworks 同级 12cd ~/WorkSpace/AOSP/platform/frameworksmkdir -p ./out/host/linux-x86/framework 获取idegen.jar 并复制到 out/host/linux-x86/framework 下idegen.jar 获取idegen.sh clone development 到本地 12git clone https://aosp.tuna.tsinghua.edu.cn/platform/development platform/development platform/development/tools/idegen/idegen.sh 或直接选择别人下好的idegen.shidegen.sh执行idegen.sh将会在～/WorkSpace/AOSP/platform/ 下生成android.iml 和 android.ipr 文件 打开android studio 选择android.ipr 导入工程即可]]></content>
+      <categories>
+        <category>技术随笔</category>
+      </categories>
+      <tags>
+        <tag>AOSP</tag>
+        <tag>源码</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[计划2019]]></title>
     <url>%2Fposts%2F397a8e26.html</url>
     <content type="text"><![CDATA[2015年12月入职的，一直在这家公司，时光如白驹过隙，一晃3年就过去了，从来没有好好静下心来回头看看。今年结了婚，有了十一，压力一下子大了一个级别，生活也瞬间过得捉襟见肘的。3年过去，自己的能力明显没有达到自己的期望，在公司这3年，怎么说呢，虽然不说虚度，但至少没有自己想象的那么努力，技术上广度我自认为还是可以的，深度就不行了，杂而不精。 希望今年不再碌碌无为，能有个质变。 2019年要努力达成的目标 ： 长10斤肉 早睡早起 每周至少运动2次 精读至少10本技术书 尽量阅读英文文档 产出至少10篇技术博客，3篇非技术博客 开源至少1个项目 Android常见组件以及目前流行框架源码至少都过一遍 参加至少1次技术沙龙 有机会去北上广深杭感受下 学会Kotlin/Flutter 并投入生产 了解，并初步使用Go 简单学习一些shell编程 工资翻一番]]></content>
