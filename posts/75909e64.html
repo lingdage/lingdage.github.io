@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link rel="stylesheet" href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext">
+  
+
+
+
+
+
+
+  
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/custom/favicon-32x32.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/custom/favicon-16x16.ico?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本文基于Android 9.0.0的源代码  framework/base/core/java/andorid/app/Service.java 简介引用官方定义:   Service 是一个可以在后台执行长时间运行操作而不提供用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IP">
+<meta name="keywords" content="源码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Service 知识总结">
+<meta property="og:url" content="https://lingdage.com/posts/75909e64.html">
+<meta property="og:site_name" content="凌大哥@Android攻城狮">
+<meta property="og:description" content="本文基于Android 9.0.0的源代码  framework/base/core/java/andorid/app/Service.java 简介引用官方定义:   Service 是一个可以在后台执行长时间运行操作而不提供用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IP">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://lingdage.com/posts/75909e64/service_lifecycle.png">
+<meta property="og:updated_time" content="2019-03-28T07:29:53.074Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Service 知识总结">
+<meta name="twitter:description" content="本文基于Android 9.0.0的源代码  framework/base/core/java/andorid/app/Service.java 简介引用官方定义:   Service 是一个可以在后台执行长时间运行操作而不提供用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IP">
+<meta name="twitter:image" content="https://lingdage.com/posts/75909e64/service_lifecycle.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://lingdage.com/posts/75909e64.html">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Android Service 知识总结 | 凌大哥@Android攻城狮</title>
+  
+
+
+
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?1a3baaa35396a9b7275eb1c8b95099c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">凌大哥@Android攻城狮</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home                         //首页"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags                    //标签"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th          //分类"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive         //归档"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user                  //关于"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-guestbook">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-newspaper-o  //留言板"></i> <br>留言板</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+  
+  
+
+  
+
+  <a href="https://github.com/lingdage" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" style="fill: #222; color: #fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://lingdage.com/posts/75909e64.html">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lingdage">
+      <meta itemprop="description" content="时间之事，最怕认真二字。">
+      <meta itemprop="image" content="/images/custom/Linux_Tux.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="凌大哥@Android攻城狮">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android Service 知识总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-23 17:18:16" itemprop="dateCreated datePublished" datetime="2019-03-23T17:18:16+08:00">2019-03-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-03-28 15:29:53" itemprop="dateModified" datetime="2019-03-28T15:29:53+08:00">2019-03-28</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/技术随笔/" itemprop="url" rel="index"><span itemprop="name">技术随笔</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/posts/75909e64.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/posts/75909e64.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/posts/75909e64.html" class="leancloud_visitors" data-flag-title="Android Service 知识总结">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">17k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">28 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p><em>本文基于Android 9.0.0的源代码</em></p>
+</blockquote>
+<p><code>framework/base/core/java/andorid/app/Service.java</code></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>引用官方定义:</p>
+<blockquote>
+<p> <code>Service</code> 是一个可以在后台执行长时间运行操作而不提供用户界面的应用组件。服务可由其他应用组件启动，而且即使用户切换到其他应用，服务仍将在后台继续运行。 此外，组件可以绑定到服务，以与之进行交互，甚至是执行进程间通信 (IPC)。 例如，服务可以处理网络事务、播放音乐，执行文件 I/O 或与内容提供程序交互，而所有这一切均可在后台进行。</p>
+<p> <strong>注意：</strong>服务在其托管进程的主线程中运行，它既不创建自己的线程，也不在单独的进程中运行（除非另行指定）。 这意味着，如果服务将执行任何 CPU 密集型工作或阻止性操作（例如 MP3 播放或联网），则应在服务内创建新线程来完成这项工作。通过使用单独的线程，可以降低发生“应用无响应”(ANR) 错误的风险，而应用的主线程仍可继续专注于运行用户与 Activity 之间的交互。</p>
+</blockquote>
+<a id="more"></a>
+<p><code>Service</code>是一个可以在后台执行长时间操作而不使用用户界面的应用组件。那么问题来了，既然它不使用用户界面，那么它怎么知道应该什么时候开始执行什么操作呢？答案是——它可以与其他的引用组件形成一些联系，从而可以根据其传来的信息在合适的时候执行合适的操作。</p>
+<p>一般来讲，这种联系分为两种：<code>startService()</code>以及<code>bindService()</code>。这两种联系都可以使得一个<code>Service</code>开始运行，但是在其他方面有着诸多不同。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>启动service的方式</strong></th>
+<th><strong>停止service的方式</strong></th>
+<th><strong>service与启动它的组件之间的通信方式</strong></th>
+<th><strong>service的生命周期</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>startService</td>
+<td>在其他组件中调用startService()方法后，服务即处于启动状态</td>
+<td>service中调用stopSelf()方法，或者其他组件调用stopService()方法后，service将停止运行</td>
+<td>没有提供默认的通信方式，启动service后该service就处于独立运行状态</td>
+<td>一旦启动，service即可在后台无限期运行，即使启动service的组件已被销毁也不受其影响，直到其被停止</td>
+</tr>
+<tr>
+<td>bindService</td>
+<td>在其他组件中调用bindService()方法后，服务即处于启动状态</td>
+<td>所有与service绑定的组件都被销毁，或者它们都调用了unbindService()方法后，service将停止运行</td>
+<td>可以通过 ServiceConnection进行通信，组件可以与service进行交互、发送请求、获取结果，甚至是利用IPC跨进程执行这些操作</td>
+<td>当所有与其绑定的组件都取消绑定(可能是组件被销毁也有可能是其调用了unbindService()方法)后，service将停止</td>
+</tr>
+</tbody>
+</table>
+<p>注：<br>1.表格中的“其他组件”不包括<code>Broadcast receiver</code>，其不能bindService,但是可以startService的</p>
+<p>2.startService()与bindService()并不冲突，同一个service可能既有组件调用了startService()启动它，又有组件与它进行了绑定。当同一个service与其他组件同时存在这两种联系时，其生命周期会发生变化，必须<strong>从两种方法的角度看service均停止</strong>才能真正停止。</p>
+<h2 id="创建Service"><a href="#创建Service" class="headerlink" title="创建Service"></a>创建Service</h2><p>创建一个<code>Service</code>一般有下面2个步骤</p>
+<ul>
+<li>创建一个类继承自<code>Service</code>(或它的子类，如<code>IntentService</code>)，重写里面的一些键的回调方法，如<code>onStartCommand()</code>，<code>onBind()</code>等</li>
+<li>在Manifests文件里面为其声明，并根据需要配置一些其他属性。</li>
+</ul>
+<p>讲道理，这一切跟新建一个<code>Activity</code>非常的像。</p>
+<ul>
+<li>onCreate()<br>在每个<code>Service</code>的生命周期中这个方法会且仅会调用一次，并且它的调用在<code>onStartCommand()</code>以及<code>onBind()</code>之前，我们可以在这个方法中进行一些一次性的初始化工作。</li>
+<li>onStartCommand()<br>当其他组件通过<code>startService()</code>方法启动<code>Service</code>时，此方法将会被调用。</li>
+<li>onBind()<br>当其他组件通过<code>bindService()</code>方法与<code>Service</code>相绑定之后，此方法将会被调用。这个方法有一个<code>IBinder</code>的返回值，这意味着在重写它的时候必须返回一个<code>IBinder</code>对象，它是用来支撑其他组件与<code>Service</code>之间的通信的——另外，如果你不想让这个<code>Service</code>被其他组件所绑定，可以通过在这个方法返回一个null值来实现。</li>
+<li>onDestroy()<br>这是<code>Service</code>一生中调用的最后一个方法，当这个方法被调用之后，<code>Service</code>就会被销毁。所以我们应当在这个方法里面进行一些资源的清理，比如注册的一些监听器什么的。</li>
+</ul>
+<p>在Manifests文件里进行声明的时候，只有android:name属性是必须要有的，其他的属性都可以没有。但是有的时候适当的配置可以让我们的开发进行地更加顺利，所以了解一下注册一个<code>Service</code>可以声明哪些属性也是很有必要的。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">service</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:enabled</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></span><br><span class="line"><span class="tag">    <span class="attr">android:exported</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></span><br><span class="line"><span class="tag">    <span class="attr">android:icon</span>=<span class="string">"drawable resource"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:isolatedProcess</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></span><br><span class="line"><span class="tag">    <span class="attr">android:label</span>=<span class="string">"string resource"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">"string"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:permission</span>=<span class="string">"string"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:process</span>=<span class="string">"string"</span> &gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>具体含义可参考<a href="https://developer.android.com/guide/topics/manifest/service-element.html?hl=zh-cn" target="_blank" rel="noopener">官网</a></p>
+<ul>
+<li>android:enabled : 如果为true，则这个<code>Service</code>可以被系统实例化，如果为false，则不行。默认为true</li>
+<li>android:exported : 如果为true，则其他应用的组件也可以调用这个<code>Service</code>并且可以与它进行互动，如果为false，则只有与<code>Service</code>同一个应用或者相同user ID的应用可以开启或绑定此<code>Service</code>。它的默认值取决于<code>Service</code>是否有<code>intent filters</code>。如果一个filter都没有，就意味着只有指定了<code>Service</code>的准确的类名才能调用，也就是说这个<code>Service</code>只能应用内部使用——其他的应用不知道它的类名。这种情况下exported的默认值就为false。反之，只要有了一个filter，就意味着<code>Service</code>是考虑到外界使用的情况的，这时exported的默认值就为true</li>
+<li>android:icon : 一个象征着这个<code>Service</code>的icon</li>
+<li>android:isolatedProcess : 如果设置为true，这个<code>Service</code>将运行在一个从系统中其他部分分离出来的特殊进程中，我们只能通过Service API来与它进行交流。默认为false。</li>
+<li>android:label : 显示给用户的这个<code>Service</code>的名字。如果不设置，将会默认使用<application>的label属性。</application></li>
+<li>android:name : 这个<code>Service</code>的路径名，例如“com.lingdage.demo.ServiceDemo”。这个属性是唯一一个必须填的属性。</li>
+<li>android:permission : 其他组件必须具有所填的权限才能启动这个<code>Service</code>。</li>
+<li>android:process : <code>Service</code>运行的进程的name。默认启动的<code>Service</code>是运行在<strong>主进程</strong>中的。</li>
+</ul>
+<h3 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceDemo</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"ServiceDome"</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate();</span><br><span class="line">        Log.d(TAG, <span class="string">"onCreate"</span>);</span><br><span class="line">        <span class="comment">//只在service创建的时候调用一次，可以在此进行一些一次性的初始化操作</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">onStartCommand</span><span class="params">(Intent intent, <span class="keyword">int</span> flags, <span class="keyword">int</span> startId)</span> </span>&#123;</span><br><span class="line">        Log.d(TAG, <span class="string">"onStartCommand"</span>);</span><br><span class="line">        <span class="comment">//当其他组件调用startService()方法时，此方法将会被调用</span></span><br><span class="line">        <span class="comment">//在这里进行这个service主要的操作</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.onStartCommand(intent, flags, startId);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Nullable</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        Log.d(TAG, <span class="string">"onBind"</span>);</span><br><span class="line">        <span class="comment">//当其他组件调用bindService()方法时，此方法将会被调用</span></span><br><span class="line">        <span class="comment">//如果不想让这个service被绑定，在此返回null即可</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Log.d(TAG, <span class="string">"onDestroy"</span>);</span><br><span class="line">        <span class="comment">//service调用的最后一个方法</span></span><br><span class="line">        <span class="comment">//在此进行资源的回收</span></span><br><span class="line">        <span class="keyword">super</span>.onDestroy();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意:每个<code>Service</code>必须在<code>manifest</code>中 通过<service>来声明</service></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="tag">&lt;<span class="name">service</span> <span class="attr">android:name</span>=<span class="string">"com.example.servicetest.ServiceDemo"</span> &gt;</span> </span><br><span class="line">&gt;   ... </span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>现在我们通过继承<code>Service</code>的方式定义了我们自己的<code>ServiceDemo</code>类,并且在<code>manifest</code>中声明了我们的<code>ServiceDemo</code>,接下来我们应该启动我们自己的服务.</p>
+<p>请注意，<code>onStartCommand()</code> 方法必须返回整型数。整型数是一个值，用于描述系统应该如何在服务终止的情况下继续运行服务（如上所述，<code>IntentService</code> 的默认实现将为您处理这种情况，不过您可以对其进行修改）。从<code>onStartCommand()</code> 返回的值必须是以下常量之一：</p>
+<ul>
+<li><p><code>START_NOT_STICKY</code></p>
+<p>如果系统在 <code>onStartCommand()</code> 返回后终止服务，则除非有挂起 Intent 要传递，否则系统<em>不会</em>重建服务。这是最安全的选项，可以避免在不必要时以及应用能够轻松重启所有未完成的作业时运行服务。</p>
+</li>
+<li><p><code>START_STICKY</code></p>
+<p>如果系统在 <code>onStartCommand()</code> 返回后终止服务，则会重建服务并调用 <code>onStartCommand()</code>，但<em>不会</em>重新传递最后一个 Intent。相反，除非有挂起 Intent 要启动服务（在这种情况下，将传递这些 Intent ），否则系统会通过空 Intent 调用 <code>onStartCommand()</code>。这适用于不执行命令、但无限期运行并等待作业的媒体播放器（或类似服务）。</p>
+</li>
+<li><p><code>START_REDELIVER_INTENT</code></p>
+<p>如果系统在 <code>onStartCommand()</code> 返回后终止服务，则会重建服务，并通过传递给服务的最后一个 Intent 调用<code>onStartCommand()</code>。任何挂起 Intent 均依次传递。这适用于主动执行应该立即恢复的作业（例如下载文件）的服务。</p>
+</li>
+</ul>
+<h2 id="启动Service"><a href="#启动Service" class="headerlink" title="启动Service"></a>启动Service</h2><p>另一个组件通过调用<code>startService()</code>方法，就可以启动一个特定的<code>Service</code>，并且这将导致<code>Service</code>中的<code>onStartCommand()</code>方法被调用。在调用<code>startService()</code>方法的时候，其他组件需要在方法中传递一个<code>Intent</code>参数，然后<code>Service</code>将会在<code>onStartCommand()</code>中接收这个<code>Intent</code>，并获取一些数据。比如此时某个<code>Activity</code>要将一些数据存入数据库中，我就可以通过<code>Intent</code>把数据传入<code>Service</code>，然后让<code>Service</code>去进行连接数据库，存储数据等操作，而此时用户可以执行其他的任何操作——甚至包括销毁那个<code>Activity</code>——这并不会影响<code>Service</code>存储数据这件事。</p>
+<p>当一个<code>Service</code>通过这种方式启动之后，它的生命周期就已经不受启动它的组件影响了，它可以在后台无限期的运行下去，只要<code>Service</code>自身没有调用<code>stopSelf()</code>并且其他的组件没有调用针对它的<code>stopService()</code>。</p>
+<p>另外，如果确定了使用这种方式启动<code>Service</code>并且不希望这个<code>Service</code>被绑定的话，那么也许除了传统的创建一个类继承<code>Service</code>之外我们有一个更好的选择——<a href="https://lingdage.com/posts/e4e64342.html">IntentService</a>。</p>
+<p>相比<code>Service</code>，IntentService要简单许多。但是要注意的是，如果你有让<code>Service</code>同时处理多个请求的需求，这个时候就只能去继承Service了。这个时候就要自己去处理工作线</p>
+<p>demo</p>
+<p>我们通过一个<code>Intent</code>对象，并调用<code>startService()</code>方法来启动<code>ServiceDemo</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Intent startIntent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, ServiceDemo.class);  </span><br><span class="line">startService(startIntent);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p> 注意,假如我们是通过点击<code>Button</code>执行上面的代码,那么第一次点击的时候回执行其中的<code>onCreate()</code>和<code>onStartCommand()</code>方法,但是当我们第二次点击的时候就只会执行<code>onStartCommand()</code>方法了.</p>
+<p>为什么会这样呢？<br>这是由于<code>onCreate()</code>方法只会在<code>Service</code>第一次被创建的时候调用，如果当前<code>Service</code>已经被创建过了(第一次点击创建了<code>ServiceDemo</code>)，不管怎样调用<code>startService()</code>方法，<code>onCreate()</code>方法都不会再执行。</p>
+</blockquote>
+<p>启动了之后,当我们想停止服务的时候该怎么做呢?</p>
+<p>我们也是通过一个<code>Intent</code>对象，并调用<code>stopService()</code>方法来停止<code>ServiceDemo</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Intent stopIntent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, ServiceDemo.class);</span><br><span class="line">stopService(stopIntent);</span><br></pre></td></tr></table></figure>
+<h2 id="停止Service"><a href="#停止Service" class="headerlink" title="停止Service"></a>停止Service</h2><p>启动服务必须管理自己的生命周期。也就是说，除非系统必须回收内存资源，否则系统不会停止或销毁服务，而且服务在<code>onStartCommand()</code> 返回后会继续运行。因此，服务必须通过调用 <code>stopSelf()</code> 自行停止运行，或者由另一个组件通过调用 <code>stopService()</code> 来停止它。</p>
+<p>一旦请求使用 <code>stopSelf()</code> 或 <code>stopService()</code> 停止服务，系统就会尽快销毁服务。</p>
+<p>但是，如果服务同时处理多个 <code>onStartCommand()</code> 请求，则您不应在处理完一个启动请求之后停止服务，因为您可能已经收到了新的启动请求（在第一个请求结束时停止服务会终止第二个请求）。为了避免这一问题，您可以使用<code>stopSelf(int)</code> 确保服务停止请求始终基于最近的启动请求。也就说，在调用 <code>stopSelf(int)</code> 时，传递与停止请求的 ID 对应的启动请求的 ID（传递给 <code>onStartCommand()</code> 的 <code>startId</code>）。然后，如果在您能够调用 <code>stopSelf(int)</code> 之前服务收到了新的启动请求，ID 就不匹配，服务也就不会停止。</p>
+<blockquote>
+<p><strong>注意：</strong>为了避免浪费系统资源和消耗电池电量，应用必须在工作完成之后停止其服务。 如有必要，其他组件可以通过调用<code>stopService()</code> 来停止服务。即使为服务启用了绑定，一旦服务收到对 <code>onStartCommand()</code> 的调用，您始终仍须亲自停止服务。</p>
+</blockquote>
+<h2 id="创建绑定服务"><a href="#创建绑定服务" class="headerlink" title="创建绑定服务"></a>创建绑定服务</h2><p>绑定服务允许应用组件通过调用 <code>bindService()</code> 与其绑定，以便创建长期连接（通常不允许组件通过调用<code>startService()</code> 来<em>启动</em>它）。</p>
+<p>如需与 Activity 和其他应用组件中的服务进行交互，或者需要通过进程间通信 (IPC) 向其他应用公开某些应用功能，则应创建绑定服务。</p>
+<p>要创建绑定服务，必须实现 <code>onBind()</code> 回调方法以返回 <code>IBinder</code>，用于定义与服务通信的接口。然后，其他应用组件可以调用 <code>bindService()</code> 来检索该接口，并开始对服务调用方法。服务只用于与其绑定的应用组件，因此如果没有组件绑定到服务，则系统会销毁服务（您<em>不必</em>按通过 <code>onStartCommand()</code> 启动的服务那样来停止绑定服务）。</p>
+<p>要创建绑定服务，首先必须定义指定客户端如何与服务通信的接口。 服务与客户端之间的这个接口必须是 <code>IBinder</code> 的实现，并且服务必须从 <code>onBind()</code> 回调方法返回它。一旦客户端收到 <code>IBinder</code>，即可开始通过该接口与服务进行交互。</p>
+<p>多个客户端可以同时绑定到服务。客户端完成与服务的交互后，会调用 <code>unbindService()</code> 取消绑定。一旦没有客户端绑定到该服务，系统就会销毁它。</p>
+<p>bindService这是一种比startService更复杂的启动方式，同时使用这种方式启动的service也能完成更多的事情，比如其他组件可向其发送请求，接受来自它的响应，甚至通过它来进行IPC等等。我们通常将绑定它的组件成为客户端，而称它为服务器。</p>
+<p>如果要创建一个支持绑定的service，我们必须要重写它的onBind()方法。这个方法会返回一个IBinder对象，它是客户端用来和服务器进行交互的接口。而要得到IBinder接口，我们通常有三种方式</p>
+<ul>
+<li>继承Binder类</li>
+<li>使用Messenger类(AIDL的简化版)</li>
+<li>使用AIDL</li>
+</ul>
+<p>这一块比较复杂,我们新开一篇讲解。<a href="https://lingdage.com/posts/ccf7cf3d.html">Android Bound Service 知识总结</a></p>
+<h2 id="在前台运行服务"><a href="#在前台运行服务" class="headerlink" title="在前台运行服务"></a>在前台运行服务</h2><p>前台服务被认为是用户主动意识到的一种服务，因此在内存不足时，系统也不会考虑将其终止。 前台服务必须为状态栏提供通知，放在“正在进行”标题下方，这意味着除非服务停止或从前台移除，否则不能清除通知。</p>
+<p>例如，应该将通过服务播放音乐的音乐播放器设置为在前台运行，这是因为用户明确意识到其操作。 状态栏中的通知可能表示正在播放的歌曲，并允许用户启动 Activity 来与音乐播放器进行交互。</p>
+<p>要请求让服务运行于前台，请调用 <code>startForeground()</code>。此方法采用两个参数：唯一标识通知的整型数和状态栏的<code>Notification</code>。例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Notification notification = <span class="keyword">new</span> Notification(R.drawable.icon, getText(R.string.ticker_text),</span><br><span class="line">        System.currentTimeMillis());</span><br><span class="line">Intent notificationIntent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, ExampleActivity.class);</span><br><span class="line">PendingIntent pendingIntent = PendingIntent.getActivity(<span class="keyword">this</span>, <span class="number">0</span>, notificationIntent, <span class="number">0</span>);</span><br><span class="line">notification.setLatestEventInfo(<span class="keyword">this</span>, getText(R.string.notification_title),</span><br><span class="line">        getText(R.string.notification_message), pendingIntent);</span><br><span class="line">startForeground(ONGOING_NOTIFICATION_ID, notification);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p> <strong>注意：</strong>提供给 <code>startForeground()</code> 的整型 ID 不得为 0。    </p>
+</blockquote>
+<p>要从前台移除服务，请调用<code>stopForeground()</code>。此方法采用一个布尔值，指示是否也移除状态栏通知。 此方法不会停止服务。 但是，如果您在服务正在前台运行时将其停止，则通知也会被移除。</p>
+<h1 id="lifecycle">管理服务生命周期</h1>
+
+<p>服务的生命周期比 <code>Activity</code>的生命周期要简单得多。但是，密切关注如何创建和销毁服务反而更加重要，因为服务可以在用户没有意识到的情况下运行于后台。</p>
+<p>服务生命周期（从创建到销毁）可以遵循两条不同的路径：</p>
+<ul>
+<li><p>启动服务</p>
+<p>该服务在其他组件调用 <code>startService()</code> 时创建，然后无限期运行，且必须通过调用 <code>stopSelf()</code> 来自行停止运行。此外，其他组件也可以通过调用 <code>stopService()</code> 来停止服务。服务停止后，系统会将其销毁。</p>
+</li>
+<li><p>绑定服务</p>
+<p>该服务在另一个组件（客户端）调用 <code>bindService()</code> 时创建。然后，客户端通过 <code>IBinder</code> 接口与服务进行通信。客户端可以通过调用 <code>unbindService()</code> 关闭连接。多个客户端可以绑定到相同服务，而且当所有绑定全部取消后，系统即会销毁该服务。 （服务<em>不必</em>自行停止运行。）</p>
+</li>
+</ul>
+<p>这两条路径并非完全独立。也就是说，您可以绑定到已经使用 <code>startService()</code> 启动的服务。例如，可以通过使用<code>Intent</code>（标识要播放的音乐）调用 <code>startService()</code> 来启动后台音乐服务。随后，可能在用户需要稍加控制播放器或获取有关当前播放歌曲的信息时，Activity 可以通过调用 <code>bindService()</code> 绑定到服务。在这种情况下，除非所有客户端均取消绑定，否则 <code>stopService()</code> 或 <code>stopSelf()</code> 不会实际停止服务。</p>
+<h2 id="实现生命周期回调"><a href="#实现生命周期回调" class="headerlink" title="实现生命周期回调"></a>实现生命周期回调</h2><p>与 <code>Activity</code> 类似，服务也拥有生命周期回调方法，您可以实现这些方法来监控服务状态的变化并适时执行工作。 以下框架服务展示了每种生命周期方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExampleService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> mStartMode;       <span class="comment">// indicates how to behave if the service is killed</span></span><br><span class="line">    IBinder mBinder;      <span class="comment">// interface for clients that bind</span></span><br><span class="line">    <span class="keyword">boolean</span> mAllowRebind; <span class="comment">// indicates whether onRebind should be used</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// The service is being created</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">onStartCommand</span><span class="params">(Intent intent, <span class="keyword">int</span> flags, <span class="keyword">int</span> startId)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// The service is starting, due to a call to startService()</span></span><br><span class="line">        <span class="keyword">return</span> mStartMode;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// A client is binding to the service with bindService()</span></span><br><span class="line">        <span class="keyword">return</span> mBinder;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onUnbind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// All clients have unbound with unbindService()</span></span><br><span class="line">        <span class="keyword">return</span> mAllowRebind;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRebind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// A client is binding to the service with bindService(),</span></span><br><span class="line">        <span class="comment">// after onUnbind() has already been called</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// The service is no longer used and is being destroyed</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>注：</strong>与 Activity 生命周期回调方法不同，您<em>不</em>需要调用这些回调方法的超类实现。</p>
+</blockquote>
+<p><img src="/posts/75909e64/service_lifecycle.png" alt="android service lifecycle"></p>
+<p>通过实现这些方法，您可以监控服务生命周期的两个嵌套循环：</p>
+<ul>
+<li><p>服务的整个生命周期从调用<code>onCreate()</code> 开始起，到<code>onDestroy()</code>返回时结束。与 Activity 类似，服务也在<code>onCreate()</code>中完成初始设置，并在<code>onDestroy()</code>中释放所有剩余资源。例如，音乐播放服务可以在<code>onCreate()</code>中创建用于播放音乐的线程，然后在<code>onDestroy()</code>中停止该线程。</p>
+<p>无论服务是通过 <code>startService()</code> 还是 <code>bindService()</code> 创建，都会为所有服务调用 <code>onCreate()</code> 和 <code>onDestroy()</code> 方法。</p>
+</li>
+<li><p>服务的有效生命周期从调用<code>onStartCommand()</code>或<code>onBind()</code>方法开始。每种方法均有<code>Intent</code>对象，该对象分别传递到<code>startService()</code>或<code>bindService()</code> 。</p>
+<p>对于启动服务，有效生命周期与整个生命周期同时结束（即便是在 <code>onStartCommand()</code> 返回之后，服务仍然处于活动状态）。对于绑定服务，有效生命周期在 <code>onUnbind()</code> 返回时结束。</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>注：</strong>尽管启动服务是通过调用 <code>stopSelf()</code> 或 <code>stopService()</code> 来停止，但是该服务并无相应的回调（没有 <code>onStop()</code> 回调）。因此，除非服务绑定到客户端，否则在服务停止时，系统会将其销毁 — <code>onDestroy()</code> 是接收到的唯一回调。</p>
+</blockquote>
+<h2 id="其他知识点"><a href="#其他知识点" class="headerlink" title="其他知识点"></a>其他知识点</h2><h3 id="Service和Thread的关系"><a href="#Service和Thread的关系" class="headerlink" title="Service和Thread的关系"></a>Service和Thread的关系</h3><p>答案：<code>Service</code>和<code>Thread</code>之间没有任何关系！</p>
+<ul>
+<li><p>两者概念的迥异</p>
+<ul>
+<li><p><code>Thread</code> 是程序执行的最小单元，它是分配CPU的基本单位，<code>Android</code>系统中UI线程也是线程的一种，当然<code>Thread</code>还可以用于执行一些耗时异步的操作。</p>
+</li>
+<li><p><code>Service</code>是<code>Android</code>的一种机制，服务是运行在主线程上的，它是由系统进程托管。它与其他组件之间的通信类似于client和server，是一种轻量级的IPC通信，这种通信的载体是<code>Binder</code>，它是在linux层交换信息的一种IPC，而所谓的<code>Service</code>后台任务只不过是指没有UI的组件罢了。</p>
+</li>
+</ul>
+</li>
+<li><p>两者的执行任务迥异</p>
+<ul>
+<li>在<code>Android</code>系统中，线程一般指的是工作线程(即后台线程)，而主线程是一种特殊的工作线程，它负责将事件分派给相应的用户界面小工具，如绘图事件及事件响应，因此为了保证应用 UI 的响应能力主线程上不可执行耗时操作。如果执行的操作不能很快完成，则应确保它们在单独的工作线程执行。</li>
+<li><code>Service</code> 则是<code>Android</code>系统中的组件，一般情况下它运行于<strong>主线程</strong>中，因此在<code>Service</code>中是不可以执行耗时操作的，否则系统会报ANR异常，之所以称<code>Service</code>为后台服务，大部分原因是它本身没有UI，用户无法感知(当然也可以利用某些手段让用户知道)，但如果需要让<code>Service</code>执行耗时任务，可在<code>Service</code>中开启单独线程去执行。</li>
+</ul>
+</li>
+<li><p>两者使用场景</p>
+<ul>
+<li><p>当要执行耗时的网络或者数据库查询以及其他阻塞UI线程或密集使用CPU的任务时，都应该使用工作线程<code>Thread</code>，这样才能保证UI线程不被占用而影响用户体验。</p>
+</li>
+<li><p>在应用程序中，如果需要长时间的在后台运行，而且不需要交互的情况下，使用服务。比如播放音乐，通过<code>Service</code>+<code>Notification</code>方式在后台执行同时在通知栏显示着。</p>
+</li>
+</ul>
+</li>
+<li><p>两者的最佳使用方式<br>在大部分情况下，<code>Thread</code>和<code>Service</code>都会结合着使用，比如下载文件，一般会通过<code>Service</code>在后台执行+<code>Notification</code>在通知栏显示+<code>Thread</code>异步下载，再如应用程序会维持一个<code>Service</code>来从网络中获取推送服务。在Android官方看来也是如此，所以官网提供了一个<code>Thread</code>与<code>Service</code>的结合来方便我们执行后台耗时任务，它就是<code>IntentService</code>，(深入了解<code>IntentService</code>，可以看<a href="https://lingdage.com/posts/e4e64342.html">IntentService</a>)，当然<code>IntentService</code>并不适用于所有的场景，但它的优点是使用方便、代码简洁，不需要我们创建<code>Service</code>实例并同时也创建线程，某些场景下还是非常赞的！由于<code>IntentService</code>是单个<code>worker thread</code>，所以任务需要排队，因此不适合大多数的多任务情况。还有为什么不直接在<code>Activity</code>里创建呢？这是因为<code>Activity</code>很难对<code>Thread</code>进行控制，当<code>Activity</code>被销毁之后，就没有任何其它的办法可以再重新获取到<strong>之前创建的子线程的实例</strong>。而且在一个<code>Activity</code>中创建的子线程，另一个<code>Activity</code>无法对其进行操作。但是<code>Service</code>就不同了，所有的<code>Activity</code>都可以与<code>Service</code>进行关联(通过绑定)，然后可以很方便地操作其中的方法，即使<code>Activity</code>被销毁了，之后只要重新与<code>Service</code>建立关联，就又能够获取到原有的<code>Service</code>中<code>Binder</code>的实例。因此，使用<code>Service</code>来处理后台任务，<code>Activity</code>就可以放心地<code>finish</code>，完全不需要担心无法对后台任务进行控制的情况。</p>
+</li>
+</ul>
+<h3 id="Service的种类"><a href="#Service的种类" class="headerlink" title="Service的种类"></a>Service的种类</h3><h4 id="按运行地点分类"><a href="#按运行地点分类" class="headerlink" title="按运行地点分类"></a><strong>按运行地点分类</strong></h4><table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>类别</strong></th>
+<th style="text-align:center"><strong>区别</strong></th>
+<th style="text-align:center"><strong>优点</strong></th>
+<th style="text-align:center"><strong>缺点</strong></th>
+<th style="text-align:center"><strong>应用</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">本地服务(Local)</td>
+<td style="text-align:center">该服务依附在主进程上</td>
+<td style="text-align:center">服务依附在主进程上而不是独立的进程，这样在一定程度上节约了资源，另外Local服务因为是在同一进程因此不需要IPC，也不需要AIDL。相应bindService会方便很多。</td>
+<td style="text-align:center">主进程被Kill后，服务便会终止。</td>
+<td style="text-align:center">非常常见的应用如：音乐播放服务。</td>
+</tr>
+<tr>
+<td style="text-align:center">远程服务(Remote)</td>
+<td style="text-align:center">该服务是独立的进程</td>
+<td style="text-align:center">服务为独立的进程，对应进程名格式为所在包名加上你指定的android:process字符串。由于是独立的进程，因此在Activity所在进程被Kill的时候，该服务依然在运行，不受其他进程影响，有利于为多个进程提供服务具有较高的灵活性。</td>
+<td style="text-align:center">该服务是独立的进程，会占用一定资源，并且使用AIDL进行IPC稍微麻烦一点。</td>
+<td style="text-align:center">一些提供系统服务的Service，这种Service是常驻的。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="按运行类型分类"><a href="#按运行类型分类" class="headerlink" title="按运行类型分类"></a>按运行类型分类</h4><table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>类别</strong></th>
+<th style="text-align:center"><strong>区别</strong></th>
+<th style="text-align:center"><strong>应用</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">前台服务</td>
+<td style="text-align:center">会在通知一栏显示 ONGOING 的 Notification，</td>
+<td style="text-align:center">当服务被终止的时候，通知一栏的 Notification 也会消失，这样对于用户有一定的通知作用。常见的如音乐播放服务。</td>
+</tr>
+<tr>
+<td style="text-align:center">后台服务</td>
+<td style="text-align:center">默认的服务即为后台服务，即不会在通知一栏显示 ONGOING 的 Notification。</td>
+<td style="text-align:center">当服务被终止的时候，用户是看不到效果的。某些不需要运行或终止提示的服务，如天气更新，日期同步，邮件同步等。</td>
+</tr>
+</tbody>
+</table>
+<p>有同学可能会问，后台服务我们可以自己创建<code>ONGOING</code>的 <code>Notification</code> 这样就成为前台服务吗？答案是否定的，前台服务是在做了上述工作之后需要调用 <code>startForeground</code>（ android 2.0 及其以后版本 ）或 <code>setForeground</code>（android 2.0 以前的版本）使服务成为 前台服务。这样做的好处在于，当服务被外部强制终止掉的时候，<code>ONGOING</code> 的 <code>Notification</code>任然会移除掉。</p>
+<p>####　<strong>按使用方式分类</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">类别</th>
+<th style="text-align:center">区别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">startService 启动的服务</td>
+<td style="text-align:center">主要用于启动一个服务执行后台任务，不进行通信。停止服务使用stopService</td>
+</tr>
+<tr>
+<td style="text-align:center">bindService 启动的服务</td>
+<td style="text-align:center">该方法启动的服务要进行通信。停止服务使用unbindService</td>
+</tr>
+<tr>
+<td style="text-align:center">startService 同时也 bindService 启动的服务</td>
+<td style="text-align:center">停止服务应同时使用stepService与unbindService</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>特别注意:<br>1、你应当知道在调用 <code>bindService</code> 绑定到<code>Service</code>的时候，你就应当保证在某处调用 <code>unbindService</code> 解除绑定（尽管 <code>Activity</code>被 <code>finish</code> 的时候绑定会自动解除，并且<code>Service</code>会自动停止）；<br>2、你应当注意 使用<code>startService</code>启动服务之后，一定要使用 <code>stopService</code>停止服务，不管你是否使用<code>bindService</code>；<br>3、同时使用 <code>startService</code> 与 <code>bindService</code> 要注意到，<code>Service</code> 的终止，需要<code>unbindService</code>与<code>stopService</code>同时调用，才能终止 <code>Service</code>，不管 <code>startService</code> 与 <code>bindService</code> 的调用顺序，如果先调用 <code>unbindService</code> 此时服务不会自动终止，再调用 <code>stopService</code> 之后服务才会停止，如果先调用<code>stopService</code> 此时服务也不会终止，而再调用 <code>unbindService</code> 或者 之前调用 <code>bindService</code> 的 <code>Context</code>不存在了（如<code>Activity</code>被<code>finish</code> 的时候）之后服务才会自动停止；<br>4、当在旋转手机屏幕的时候，当手机屏幕在“横”“竖”变换时，此时如果你的 <strong>Activity</strong> 如果会自动旋转的话，旋转其实是 Activity 的重新创建，因此旋转之前的使用 bindService 建立的连接便会断开（<code>Context</code>不存在了），对应服务的生命周期与上述相同。<br>5、在 sdk 2.0 及其以后的版本中，对应的 <code>onStart</code> 已经被否决变为了 <code>onStartCommand</code>，不过之前的 <code>onStart</code> 任然有效。这意味着，如果你开发的应用程序用的 sdk 为 2.0 及其以后的版本，那么你应当使用<code>onStartCommand</code>而不是 <code>onStart</code>。</p>
+</blockquote>
+<p>这两种启动方式生命周期可以参考<a href="https://www.jianshu.com/p/9ff1e04268c0" target="_blank" rel="noopener">Android Service本地服务详解</a></p>
+<h3 id="onStartCommand详解"><a href="#onStartCommand详解" class="headerlink" title="onStartCommand详解"></a>onStartCommand详解</h3><p>第一次调用<code>startService</code>方法时，<code>onCreate</code>方法、<code>onStartCommand`</code>方法将依次被调用，而多次调用startService<code>时，只有</code>onStartCommand<code>方法被调用，最后我们调用</code>stopService<code>方法停止服务时</code>onDestory<code>方法被回调，这就是启动状态下</code>Service`的执行周期。接着我们重新回过头来进一步分析onStartCommand（Intent intent, int flags, int startId），这个方法有3个传入参数，它们的含义如下：</p>
+<ul>
+<li><p>intent ：启动时，启动组件传递过来的Intent，如Activity可利用Intent封装所需要的参数并传递给Service</p>
+</li>
+<li><p>flags：表示启动请求时是否有额外数据，可选值有 0，START_FLAG_REDELIVERY，START_FLAG_RETRY，0代表没有，它们具体含义如下：</p>
+<ul>
+<li>START_FLAG_REDELIVERY<br>这个值代表了onStartCommand方法的返回值为 START_REDELIVER_INTENT，而且在上一次服务被杀死前会去调用stopSelf方法停止服务。其中START_REDELIVER_INTENT意味着当Service因内存不足而被系统kill后，则会重建服务，并通过传递给服务的最后一个 Intent 调用 onStartCommand()，此时Intent时有值的。</li>
+<li>START_FLAG_RETRY<br>该flag代表当onStartCommand调用后一直没有返回值时，会尝试重新去调用onStartCommand()。</li>
+</ul>
+</li>
+<li><p>startId ： 指明当前服务的唯一ID，与stopSelfResult (int startId)配合使用，stopSelfResult 可以更安全地根据ID停止服务。</p>
+</li>
+</ul>
+<hr>
+<p>另外，我们注意到onStartCommand()的返回值是一个很奇怪的值<code>START_STICKY</code>，这是个什么呢？或者说这个方法的返回值是用来干嘛的呢？事实上，它的返回值是用来指定系统对当前线程的行为的。它的返回值必须是以下常量之一： </p>
+<ul>
+<li><p>START_NOT_STICKY : 如果系统在 onStartCommand() 返回后终止服务，则除非有挂起 Intent 要传递，否则系统不会重建服务。这是最安全的选项，可以避免在不必要时以及应用能够轻松重启所有未完成的作业时运行服务。</p>
+</li>
+<li><p>START_STICKY : 如果系统在 onStartCommand() 返回后终止服务，则会重建服务并调用 onStartCommand()，但绝对不会重新传递最后一个 Intent。相反，除非有挂起 Intent 要启动服务（在这种情况下，将传递这些 Intent ），否则系统会通过空 Intent 调用 onStartCommand()。这适用于不执行命令、但无限期运行并等待作业的媒体播放器（或类似服务）。</p>
+</li>
+<li><p>START_REDELIVER_INTENT : 如果系统在 onStartCommand() 返回后终止服务，则会重建服务，并通过传递给服务的最后一个 Intent 调用 onStartCommand()。任何挂起 Intent 均依次传递。这适用于主动执行应该立即恢复的作业（例如下载文件）的服务。</p>
+</li>
+</ul>
+<h3 id="关于启动服务与绑定服务间的转换问题"><a href="#关于启动服务与绑定服务间的转换问题" class="headerlink" title="关于启动服务与绑定服务间的转换问题"></a>关于启动服务与绑定服务间的转换问题</h3><p>虽然服务的状态有启动和绑定两种，但实际上一个服务可以同时是这两种状态，也就是说，它既可以是启动服务（以无限期运行），也可以是绑定服务。有点需要注意的是Android系统仅会为一个<code>Service</code>创建一个实例对象，所以不管是启动服务还是绑定服务，操作的是同一个<code>Service</code>实例，而且由于绑定服务或者启动服务执行顺序问题将会出现以下两种情况：</p>
+<ul>
+<li><p>先绑定服务后启动服务<br>如果当前<code>Service</code>实例先以绑定状态运行，然后再以启动状态运行，那么绑定服务将会转为启动服务运行，这时如果之前绑定的宿主<code>Activity</code>被销毁了，也不会影响服务的运行，服务还是会一直运行下去，指定收到调用停止服务或者内存不足时才会销毁该服务。</p>
+</li>
+<li><p>先启动服务后绑定服务<br>如果当前<code>Service</code>实例先以启动状态运行，然后再以绑定状态运行，当前启动服务并不会转为绑定服务，但是还是会与宿主绑定，只是即使宿主解除绑定后，服务依然按启动服务的生命周期在后台运行，直到有<code>Context</code>调用了<code>stopService()</code>或是服务本身调用了<code>stopSelf()</code>方法抑或内存不足时才会销毁服务。</p>
+</li>
+</ul>
+<p>以上两种情况显示出启动服务的优先级确实比绑定服务高一些。不过无论<code>Service</code>是处于启动状态还是绑定状态，或处于启动并且绑定状态，我们都可以像使用<code>Activity</code>那样通过调用<code>Intent</code> 来使用服务(即使此服务来自另一应用)。 当然，我们也可以通过清单文件将服务声明为私有服务，阻止其他应用访问。最后这里有点需要特殊说明一下的，由于服务在其托管进程的主线程中运行（UI线程），它既不创建自己的线程，也不在单独的进程中运行（除非另行指定）。 这意味着，如果服务将执行任何耗时事件或阻止性操作（例如 MP3 播放或联网）时，则应在服务内创建新线程来完成这项工作，简而言之，耗时操作应该另起线程执行。只有通过使用单独的线程，才可以降低发生“应用无响应”(ANR) 错误的风险，这样应用的主线程才能专注于用户与 Activity 之间的交互， 以达到更好的用户体验。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://blog.csdn.net/luoyanglizi/article/details/51586437" target="_blank" rel="noopener">Android中的Service：默默的奉献者 (1)</a></p>
+<p><a href="https://developer.android.com/guide/components/services?hl=zh-cn" target="_blank" rel="noopener">Android Developers/Docs/指南/服务</a></p>
+<p><a href="https://juejin.im/entry/589fd89b61ff4b006b48e41c" target="_blank" rel="noopener">全面了解 Service</a></p>
+<p><a href="https://blog.csdn.net/javazejian/article/details/52709857" target="_blank" rel="noopener">关于Android Service真正的完全详解，你需要知道的一切</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+      <div>
+      <div>
+  
+    <div style="text-align:center;color: #ccc;font-size:16px;">------------- 本文结束 <i class="fa fa-smile-o"></i> 感谢您的阅读 -------------</div>
+  
+</div>
+
+      </div>
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/custom/wechatpay.jpg" alt="lingdage 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/custom/alipay.jpg" alt="lingdage 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/posts/75909e64.html">Android Service 知识总结</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 lingdage 的个人博客">lingdage</a></p>
+  <p><span>发布时间:</span>2019年03月23日 - 17:18</p>
+  <p><span>最后更新:</span>2019年03月28日 - 15:29</p>
+  <p><span>原始链接:</span><a href="/posts/75909e64.html" title="Android Service 知识总结">https://lingdage.com/posts/75909e64.html</a>
+    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://lingdage.com/posts/75909e64.html" aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+</div>
+<script>
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({
+          title: "",
+          text: '复制成功',
+          icon: "success",
+          showConfirmButton: true
+          });
+	});
+    });
+</script>
+
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码/" rel="tag"><i class="fa fa-tag"></i> 源码</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+            
+              <div id="needsharebutton-postbottom">
+                <span class="btn">
+                  <i class="fa fa-share-alt" aria-hidden="true"></i>
+                </span>
+              </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/26c77b42.html" rel="next" title="ThreadLocal 源码分析">
+                <i class="fa fa-chevron-left"></i> ThreadLocal 源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/ccf7cf3d.html" rel="prev" title="Android Bound Service 知识总结">
+                Android Bound Service 知识总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/custom/Linux_Tux.png" alt="lingdage">
+            
+              <p class="site-author-name" itemprop="name">lingdage</p>
+              <div class="site-description motion-element" itemprop="description">时间之事，最怕认真二字。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lingdage" title="GitHub &rarr; https://github.com/lingdage" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Service"><span class="nav-number">2.</span> <span class="nav-text">创建Service</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Demo"><span class="nav-number">2.1.</span> <span class="nav-text">Demo</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动Service"><span class="nav-number">3.</span> <span class="nav-text">启动Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#停止Service"><span class="nav-number">4.</span> <span class="nav-text">停止Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建绑定服务"><span class="nav-number">5.</span> <span class="nav-text">创建绑定服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在前台运行服务"><span class="nav-number">6.</span> <span class="nav-text">在前台运行服务</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#lifecycle"><span class="nav-number"></span> <span class="nav-text">管理服务生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现生命周期回调"><span class="nav-number">1.</span> <span class="nav-text">实现生命周期回调</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他知识点"><span class="nav-number">2.</span> <span class="nav-text">其他知识点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Service和Thread的关系"><span class="nav-number">2.1.</span> <span class="nav-text">Service和Thread的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Service的种类"><span class="nav-number">2.2.</span> <span class="nav-text">Service的种类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#按运行地点分类"><span class="nav-number">2.2.1.</span> <span class="nav-text">按运行地点分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#按运行类型分类"><span class="nav-number">2.2.2.</span> <span class="nav-text">按运行类型分类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#onStartCommand详解"><span class="nav-number">2.3.</span> <span class="nav-text">onStartCommand详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于启动服务与绑定服务间的转换问题"><span class="nav-number">2.4.</span> <span class="nav-text">关于启动服务与绑定服务间的转换问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></li></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-hand-peace-o"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lingdage</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+  
+  <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.min.js"></script>
+
+  
+  <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.ui.min.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+  
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/valine/1.3.4/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'QiQFEXrz79fJQFo6MhLRdtje-gzGzoHsz',
+    appKey: 'C6GGTQU7p8kJ4vf6rlYzywbm',
+    placeholder: '留下你的小心心',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '20' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+  <script>
+    
+      pbOptions = {};
+      
+        pbOptions.iconStyle = "default";
+      
+        pbOptions.boxForm = "horizontal";
+      
+        pbOptions.position = "bottomCenter";
+      
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+        flOptions.iconStyle = "default";
+      
+        flOptions.boxForm = "horizontal";
+      
+        flOptions.position = "middleRight";
+      
+        flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

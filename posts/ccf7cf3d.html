@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-bounce.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link rel="stylesheet" href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext">
+  
+
+
+
+
+
+
+  
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/custom/favicon-32x32.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/custom/favicon-16x16.ico?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="基础知识绑定服务是客户端-服务器接口中的服务器。绑定服务可让组件（例如 Activity）绑定到服务、发送请求、接收响应，甚至执行进程间通信 (IPC)。 绑定服务通常只在为其他应用组件服务时处于活动状态，不会无限期在后台运行。 本文向您介绍如何创建绑定服务，包括如何绑定到来自其他应用组件的服务。 不过，您还应参阅Android Service 知识总结，了解有关一般服务的更多信息，例如：如何利用">
+<meta name="keywords" content="源码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Bound Service 知识总结">
+<meta property="og:url" content="https://lingdage.com/posts/ccf7cf3d.html">
+<meta property="og:site_name" content="凌大哥@Android攻城狮">
+<meta property="og:description" content="基础知识绑定服务是客户端-服务器接口中的服务器。绑定服务可让组件（例如 Activity）绑定到服务、发送请求、接收响应，甚至执行进程间通信 (IPC)。 绑定服务通常只在为其他应用组件服务时处于活动状态，不会无限期在后台运行。 本文向您介绍如何创建绑定服务，包括如何绑定到来自其他应用组件的服务。 不过，您还应参阅Android Service 知识总结，了解有关一般服务的更多信息，例如：如何利用">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://lingdage.com/posts/ccf7cf3d/service_binding_tree_lifecycle.png">
+<meta property="og:updated_time" content="2019-03-28T07:49:31.761Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Bound Service 知识总结">
+<meta name="twitter:description" content="基础知识绑定服务是客户端-服务器接口中的服务器。绑定服务可让组件（例如 Activity）绑定到服务、发送请求、接收响应，甚至执行进程间通信 (IPC)。 绑定服务通常只在为其他应用组件服务时处于活动状态，不会无限期在后台运行。 本文向您介绍如何创建绑定服务，包括如何绑定到来自其他应用组件的服务。 不过，您还应参阅Android Service 知识总结，了解有关一般服务的更多信息，例如：如何利用">
+<meta name="twitter:image" content="https://lingdage.com/posts/ccf7cf3d/service_binding_tree_lifecycle.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://lingdage.com/posts/ccf7cf3d.html">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Android Bound Service 知识总结 | 凌大哥@Android攻城狮</title>
+  
+
+
+
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?1a3baaa35396a9b7275eb1c8b95099c4";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">凌大哥@Android攻城狮</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home                         //首页"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags                    //标签"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th          //分类"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive         //归档"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user                  //关于"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-guestbook">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/guestbook/" rel="section"><i class="menu-item-icon fa fa-fw fa-newspaper-o  //留言板"></i> <br>留言板</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+  
+  
+
+  
+
+  <a href="https://github.com/lingdage" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" style="fill: #222; color: #fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://lingdage.com/posts/ccf7cf3d.html">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lingdage">
+      <meta itemprop="description" content="时间之事，最怕认真二字。">
+      <meta itemprop="image" content="/images/custom/Linux_Tux.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="凌大哥@Android攻城狮">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android Bound Service 知识总结
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-25 11:35:44" itemprop="dateCreated datePublished" datetime="2019-03-25T11:35:44+08:00">2019-03-25</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-03-28 15:49:31" itemprop="dateModified" datetime="2019-03-28T15:49:31+08:00">2019-03-28</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/技术随笔/" itemprop="url" rel="index"><span itemprop="name">技术随笔</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/posts/ccf7cf3d.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/posts/ccf7cf3d.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/posts/ccf7cf3d.html" class="leancloud_visitors" data-flag-title="Android Bound Service 知识总结">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">15k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">25 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><p>绑定服务是客户端-服务器接口中的服务器。绑定服务可让组件（例如 Activity）绑定到服务、发送请求、接收响应，甚至执行进程间通信 (IPC)。 绑定服务通常只在为其他应用组件服务时处于活动状态，不会无限期在后台运行。</p>
+<p>本文向您介绍如何创建绑定服务，包括如何绑定到来自其他应用组件的服务。 不过，您还应参阅<a href="https://lingdage.com/posts/75909e64.html">Android Service 知识总结</a>，了解有关一般服务的更多信息，例如：如何利用服务传送通知、如何将服务设置为在前台运行等等。</p>
+<p>绑定服务是 <code>Service</code> 类的实现，可让其他应用与其绑定和交互。要提供服务绑定，您必须实现 <code>onBind()</code> 回调方法。该方法返回的 <code>IBinder</code> 对象定义了客户端用来与服务进行交互的编程接口。</p>
+<a id="more"></a>
+<blockquote>
+<p>绑定到已启动服务</p>
+<p>正如<a href="https://lingdage.com/posts/75909e64.html">Android Service 知识总结</a>中所述，可以创建同时具有已启动和绑定两种状态的服务。 也就是说，可通过调用<code>startService()</code> 启动该服务，让服务无限期运行；此外，还可通过调用 <code>bindService()</code> 使客户端绑定到服务。</p>
+<p>如果您确实允许服务同时具有已启动和绑定状态，则服务启动后，系统“不会”在所有客户端都取消绑定时销毁服务。 为此，您必须通过调用 <code>stopSelf()</code> 或 <code>stopService()</code> 显式停止服务。</p>
+<p>尽管您通常应该实现 <code>onBind()</code> <em>或</em> <code>onStartCommand()</code>，但有时需要同时实现这两者。例如，音乐播放器可能发现让其服务无限期运行并同时提供绑定很有用处。 这样一来，Activity 便可启动服务进行音乐播放，即使用户离开应用，音乐播放也不会停止。 然后，当用户返回应用时，Activity 可绑定到服务，重新获得回放控制权。</p>
+<p>请务必阅读<a href="https://lingdage.com/posts/75909e64.html#lifecycle">管理绑定服务的生命周期</a>部分，详细了解有关为已启动服务添加绑定时该服务的生命周期信息。</p>
+</blockquote>
+<p>客户端可通过调用 <code>bindService()</code> 绑定到服务。调用时，它必须提供 <code>ServiceConnection</code> 的实现，后者会监控与服务的连接。<code>bindService()</code> 方法会立即无值返回，但当 Android 系统创建客户端与服务之间的连接时，会对 <code>ServiceConnection</code> 调用 <code>onServiceConnected()</code>，向客户端传递用来与服务通信的 <code>IBinder</code>。</p>
+<p>多个客户端可同时连接到一个服务。不过，只有在第一个客户端绑定时，系统才会调用服务的 <code>onBind()</code> 方法来检索 <code>IBinder</code>。系统随后无需再次调用 <code>onBind()</code>，便可将同一 <code>IBinder</code> 传递至任何其他绑定的客户端。</p>
+<p>当最后一个客户端取消与服务的绑定时，系统会将服务销毁（除非 <code>startService()</code> 也启动了该服务）。</p>
+<p>当您实现绑定服务时，最重要的环节是定义您的 <code>onBind()</code> 回调方法返回的接口。您可以通过几种不同的方法定义服务的<code>IBinder</code> 接口，下文对这些方法逐一做了阐述。</p>
+<h2 id="创建绑定服务"><a href="#创建绑定服务" class="headerlink" title="创建绑定服务"></a>创建绑定服务</h2><p>创建提供绑定的服务时，您必须提供 <code>IBinder</code>，用以提供客户端用来与服务进行交互的编程接口。 您可以通过三种方法定义接口：</p>
+<ul>
+<li><p>扩展 Binder 类<br>如果服务是供您的自有应用专用，并且在与客户端相同的进程中运行（常见情况），则应通过扩展 <code>Binder</code> 类并从 <code>onBind()</code> 返回它的一个实例来创建接口。客户端收到 <code>Binder</code> 后，可利用它直接访问 <code>Binder</code> 实现中乃至 <code>Service</code>中可用的公共方法。<br>如果服务只是您的自有应用的后台工作线程，则优先采用这种方法。 不以这种方式创建接口的唯一原因是，您的服务被其他应用或不同的进程占用。</p>
+</li>
+<li><p>使用 Messenger<br>如需让接口跨不同的进程工作，则可使用 <code>Messenger</code> 为服务创建接口。服务可以这种方式定义对应于不同类型 <code>Message</code> 对象的 <code>Handler</code>。此 <code>Handler</code> 是 <code>Messenger</code> 的基础，后者随后可与客户端分享一个 <code>IBinder</code>，从而让客户端能利用 <code>Message</code> 对象向服务发送命令。此外，客户端还可定义自有 <code>Messenger</code>，以便服务回传消息。<br>这是执行进程间通信 (IPC) 的最简单方法，因为 <code>Messenger</code> 会在单一线程中创建包含所有请求的队列，这样您就不必对服务进行线程安全设计。</p>
+</li>
+<li><p>使用 AIDL<br>AIDL（Android 接口定义语言）执行所有将对象分解成原语的工作，操作系统可以识别这些原语并将它们编组到各进程中，以执行 IPC。 之前采用 <code>Messenger</code> 的方法实际上是以 AIDL 作为其底层结构。 如上所述，<code>Messenger</code> 会在单一线程中创建包含所有客户端请求的队列，以便服务一次接收一个请求。 不过，如果您想让服务同时处理多个请求，则可直接使用 AIDL。 在此情况下，您的服务必须具备多线程处理能力，并采用线程安全式设计。<br>如需直接使用 AIDL，您必须创建一个定义编程接口的 .aidl 文件。Android SDK 工具利用该文件生成一个实现接口并处理 IPC 的抽象类，您随后可在服务内对其进行扩展。</p>
+<blockquote>
+<p>注：大多数应用“都不会”使用 AIDL 来创建绑定服务，因为它可能要求具备多线程处理能力，并可能导致实现的复杂性增加。因此，AIDL 并不适合大多数应用，本文也不会阐述如何将其用于您的服务。如果您确定自己需要直接使用 AIDL，请参阅 AIDL 文档。</p>
+</blockquote>
+<blockquote>
+<p>在Android系统中，一个进程是不能直接访问另一个进程的内存的，需要提供一些机制在不同的进程之间进行通信，Android官方推出了AIDL(Android Interface Definition Language)，它是基于Binder机制的，至于官方为什么要采用Binder，查看<a href="https://www.zhihu.com/question/39440766" target="_blank" rel="noopener">为什么Android要采用Binder作为IPC机制</a>，分析很全面。<br>如果组件与服务通信是在同一进程，就使用第一种方式；如果是跨进程通信，使用第二种和第三种，两者不同在于，Messenger不能处理多线程并发请求。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="Binder">扩展 Binder 类</h3>
+
+
+<p>如果您的服务仅供本地应用使用，不需要跨进程工作，则可以实现自有 <code>Binder</code> 类，让您的客户端通过该类直接访问服务中的公共方法。</p>
+<blockquote>
+<p><strong>注</strong>：此方法只有在客户端和服务位于同一应用和进程内这一最常见的情况下方才有效。 例如，对于需要将 Activity 绑定到在后台播放音乐的自有服务的音乐应用，此方法非常有效。</p>
+</blockquote>
+<p>以下是具体的设置方法：</p>
+<ol>
+<li><p>在您的服务中，创建一个可满足下列任一要求的<code>Binder</code><br> 实例：</p>
+<ul>
+<li>包含客户端可调用的公共方法</li>
+<li>返回当前 <code>Service</code> 实例，其中包含客户端可调用的公共方法</li>
+<li>或返回由服务承载的其他类的实例，其中包含客户端可调用的公共方法</li>
+</ul>
+</li>
+<li><p>从 <code>onBind()</code> 回调方法返回此 <code>Binder</code> 实例。</p>
+</li>
+<li><p>在客户端中，从 <code>onServiceConnected()</code> 回调方法接收 <code>Binder</code>，并使用提供的方法调用绑定服务。</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>注</strong>：之所以要求服务和客户端必须在同一应用内，是为了便于客户端转换返回的对象和正确调用其 API。服务和客户端还必须在同一进程内，因为此方法不执行任何跨进程编组。</p>
+</blockquote>
+<p>例如，以下这个服务可让客户端通过 Binder 实现访问服务中的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LocalService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Binder given to clients</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> IBinder mBinder = <span class="keyword">new</span> LocalBinder();</span><br><span class="line">    <span class="comment">// Random number generator</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Random mGenerator = <span class="keyword">new</span> Random();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Class used for the client Binder.  Because we know this service always</span></span><br><span class="line"><span class="comment">     * runs in the same process as its clients, we don't need to deal with IPC.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LocalBinder</span> <span class="keyword">extends</span> <span class="title">Binder</span> </span>&#123;</span><br><span class="line">        <span class="function">LocalService <span class="title">getService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="comment">// Return this instance of LocalService so clients can call public methods</span></span><br><span class="line">            <span class="keyword">return</span> LocalService.<span class="keyword">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mBinder;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** method for clients */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getRandomNumber</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> mGenerator.nextInt(<span class="number">100</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>LocalBinder</code> 为客户端提供 <code>getService()</code> 方法，以检索 <code>LocalService</code> 的当前实例。这样，客户端便可调用服务中的公共方法。 例如，客户端可调用服务中的 <code>getRandomNumber()</code>。</p>
+<p>点击按钮时，以下这个 Activity 会绑定到 <code>LocalService</code> 并调用 <code>getRandomNumber()</code> ：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BindingActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</span><br><span class="line">    LocalService mService;</span><br><span class="line">    <span class="keyword">boolean</span> mBound = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.main);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStart();</span><br><span class="line">        <span class="comment">// Bind to LocalService</span></span><br><span class="line">        Intent intent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, LocalService.class);</span><br><span class="line">        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStop();</span><br><span class="line">        <span class="comment">// Unbind from the service</span></span><br><span class="line">        <span class="keyword">if</span> (mBound) &#123;</span><br><span class="line">            unbindService(mConnection);</span><br><span class="line">            mBound = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** Called when a button is clicked (the button in the layout file attaches to</span></span><br><span class="line"><span class="comment">      * this method with the android:onClick attribute) */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onButtonClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mBound) &#123;</span><br><span class="line">            <span class="comment">// Call a method from the LocalService.</span></span><br><span class="line">            <span class="comment">// However, if this call were something that might hang, then this request should</span></span><br><span class="line">            <span class="comment">// occur in a separate thread to avoid slowing down the activity performance.</span></span><br><span class="line">            <span class="keyword">int</span> num = mService.getRandomNumber();</span><br><span class="line">            Toast.makeText(<span class="keyword">this</span>, <span class="string">"number: "</span> + num, Toast.LENGTH_SHORT).show();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** Defines callbacks for service binding, passed to bindService() */</span></span><br><span class="line">    <span class="keyword">private</span> ServiceConnection mConnection = <span class="keyword">new</span> ServiceConnection() &#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName className,</span></span></span><br><span class="line"><span class="function"><span class="params">                IBinder service)</span> </span>&#123;</span><br><span class="line">            <span class="comment">// We've bound to LocalService, cast the IBinder and get LocalService instance</span></span><br><span class="line">            LocalBinder binder = (LocalBinder) service;</span><br><span class="line">            mService = binder.getService();</span><br><span class="line">            mBound = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName arg0)</span> </span>&#123;</span><br><span class="line">            mBound = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上例说明了客户端如何使用 <code>ServiceConnection</code> 的实现和 <code>onServiceConnected()</code> 回调绑定到服务。<a href="#Binding">下文</a>更详细介绍了绑定到服务的过程。</p>
+<blockquote>
+<p><strong>注</strong>：在上例中，<code>onStop()</code> 方法将客户端与服务取消绑定。 客户端应在适当时机与服务取消绑定，如<a href="#Additional_Notes">附加说明</a>中所述。</p>
+</blockquote>
+<h3 id="使用-Messenger"><a href="#使用-Messenger" class="headerlink" title="使用 Messenger"></a>使用 Messenger</h3><blockquote>
+<p>与 AIDL 比较</p>
+<p>当您需要执行 IPC 时，为您的接口使用 <code>Messenger</code> 要比使用 AIDL 实现它更加简单，因为 <code>Messenger</code> 会将所有服务调用排入队列，而纯粹的 AIDL 接口会同时向服务发送多个请求，服务随后必须应对多线程处理。</p>
+<p>对于大多数应用，服务不需要执行多线程处理，因此使用 <code>Messenger</code> 可让服务一次处理一个调用。如果您的服务必须执行多线程处理，则应使用 <a href="https://developer.android.com/guide/components/aidl.html?hl=zh-cn" target="_blank" rel="noopener">AIDL</a> 来定义接口。</p>
+</blockquote>
+<p>如需让服务与远程进程通信，则可使用 <code>Messenger</code> 为您的服务提供接口。利用此方法，您无需使用 AIDL 便可执行进程间通信 (IPC)。</p>
+<p>以下是 <code>Messenger</code> 的使用方法摘要：</p>
+<ul>
+<li>服务实现一个 <code>Handler</code>，由其接收来自客户端的每个调用的回调</li>
+<li><code>Handler</code> 用于创建 <code>Messenger</code> 对象（对 <code>Handler</code> 的引用）</li>
+<li><code>Messenger</code> 创建一个 <code>IBinder</code>，服务通过 <code>onBind()</code> 使其返回客户端</li>
+<li>客户端使用 <code>IBinder</code> 将 <code>Messenger</code>（引用服务的 <code>Handler</code>）实例化，然后使用后者将 <code>Message</code> 对象发送给服务</li>
+<li>服务在其 <code>Handler</code> 中（具体地讲，是在 <code>handleMessage()</code> 方法中）接收每个 <code>Message</code>。</li>
+</ul>
+<p>这样，客户端并没有调用服务的“方法”。而客户端传递的“消息”（Message 对象）是服务在其 Handler 中接收的。<br>以下是一个使用 Messenger 接口的简单服务示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MessengerService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line">    <span class="comment">/** Command to the service to display a message */</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MSG_SAY_HELLO = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Handler of incoming messages from clients.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">IncomingHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">switch</span> (msg.what) &#123;</span><br><span class="line">                <span class="keyword">case</span> MSG_SAY_HELLO:</span><br><span class="line">                    Toast.makeText(getApplicationContext(), <span class="string">"hello!"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">default</span>:</span><br><span class="line">                    <span class="keyword">super</span>.handleMessage(msg);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Target we publish for clients to send messages to IncomingHandler.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">final</span> Messenger mMessenger = <span class="keyword">new</span> Messenger(<span class="keyword">new</span> IncomingHandler());</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * When binding to the service, we return an interface to our messenger</span></span><br><span class="line"><span class="comment">     * for sending messages to the service.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        Toast.makeText(getApplicationContext(), <span class="string">"binding"</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">        <span class="keyword">return</span> mMessenger.getBinder();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>请注意，服务就是在 <code>Handler#handleMessage()</code> 方法中接收传入的 <code>Message</code>，并根据 what 成员决定下一步操作。</p>
+<p>客户端只需根据服务返回的<code>IBinder</code> 创建一个 <code>Messenger</code>，然后利用 send() 发送一条消息。例如，以下就是一个绑定到服务并向服务传递 MSG_SAY_HELLO 消息的简单 Activity：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ActivityMessenger</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</span><br><span class="line">    <span class="comment">/** Messenger for communicating with the service. */</span></span><br><span class="line">    Messenger mService = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** Flag indicating whether we have called bind on the service. */</span></span><br><span class="line">    <span class="keyword">boolean</span> mBound;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Class for interacting with the main interface of the service.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> ServiceConnection mConnection = <span class="keyword">new</span> ServiceConnection() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName className, IBinder service)</span> </span>&#123;</span><br><span class="line">            <span class="comment">// This is called when the connection with the service has been</span></span><br><span class="line">            <span class="comment">// established, giving us the object we can use to</span></span><br><span class="line">            <span class="comment">// interact with the service.  We are communicating with the</span></span><br><span class="line">            <span class="comment">// service using a Messenger, so here we get a client-side</span></span><br><span class="line">            <span class="comment">// representation of that from the raw IBinder object.</span></span><br><span class="line">            mService = <span class="keyword">new</span> Messenger(service);</span><br><span class="line">            mBound = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName className)</span> </span>&#123;</span><br><span class="line">            <span class="comment">// This is called when the connection with the service has been</span></span><br><span class="line">            <span class="comment">// unexpectedly disconnected -- that is, its process crashed.</span></span><br><span class="line">            mService = <span class="keyword">null</span>;</span><br><span class="line">            mBound = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!mBound) <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">// Create and send a message to the service, using a supported 'what' value</span></span><br><span class="line">        Message msg = Message.obtain(<span class="keyword">null</span>, MessengerService.MSG_SAY_HELLO, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            mService.send(msg);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.main);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStart();</span><br><span class="line">        <span class="comment">// Bind to the service</span></span><br><span class="line">        bindService(<span class="keyword">new</span> Intent(<span class="keyword">this</span>, MessengerService.class), mConnection,</span><br><span class="line">            Context.BIND_AUTO_CREATE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStop();</span><br><span class="line">        <span class="comment">// Unbind from the service</span></span><br><span class="line">        <span class="keyword">if</span> (mBound) &#123;</span><br><span class="line">            unbindService(mConnection);</span><br><span class="line">            mBound = <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>请注意，此示例并未说明服务如何对客户端作出响应。如果您想让服务作出响应，则还需要在客户端中创建一个<code>Messenger</code>。然后，当客户端收到 <code>onServiceConnected()</code> 回调时，会向服务发送一条 <code>Message</code>，并在其 <code>send()</code> 方法的 <code>replyTo</code> 参数中包含客户端的 <code>Messenger</code>。</p>
+<h3 id="使用-AIDL"><a href="#使用-AIDL" class="headerlink" title="使用 AIDL"></a>使用 AIDL</h3><p>AIDL，即<code>Android Interface Definition Language</code>，Android接口定义语言。它是一种IDL语言，可以拿来生成用于IPC的代码。在我看来，它其实就是一个模板。为什么这样说呢？在我们的使用中，实际上起作用的并不是我们写的AIDL代码，而是系统根据它生成的一个IInterface实例的代码。而如果大家多生成几个这样的实例，然后把它们拿来比较，你会发现它们都是有套路的——都是一样的流程，一样的结构，只是根据具体的AIDL文件的不同有细微的变动。所以其实AIDL就是为了避免我们一遍遍的写一些千篇一律的代码而出现的一个模板。</p>
+<p>使用<code>Messenger</code>也是基于AIDL的，<code>Messenger</code>把所有请求都放在一个线程中，service每次处理一个。然而对于AIDL实现来说。service可以同时处理多个请求（应该是并发处理）。这种情况下，你的服务必须拥有多线程处理能力，并且是以线程安全的方式编写的。<br>要直接使用AIDL，你必须创建一个<code>.aidl</code>文件，其中定义了编程接口。 Android SDK 工具使用此文件来自动生成一个抽象类，其中实现了接口及对IPC的处理，然后我们就可以在自己的服务中继承该类。</p>
+<p>那么如何使用AIDL来通过bindService()进行线程间通信呢？基本上有下面这些步骤：</p>
+<p>服务端创建一个AIDL文件，将暴露给客户端的接口在里面声明<br>在service中实现这些接口<br>客户端绑定服务端，并将onServiceConnected()得到的IBinder转为AIDL生成的IInterface实例<br>通过得到的实例调用其暴露的方法<br>上面的描述其实比较抽象，基本上是那种看了也不知道怎么做的类型——这个如果要展开讲的话就又是长篇大论的了。基于这种考虑，这里只是简单的介绍一下AIDL这个东西，它的具体的语法，到底怎么来实现IPC，参考<a href="https://blog.csdn.net/xiaohanluo/article/details/53911529" target="_blank" rel="noopener">Android进程通信之Messenger&amp;AIDL使用详解</a>。</p>
+<p></p><h2 id="Binding">绑定到服务</h2><br>应用组件（客户端）可通过调用 <code>bindService()</code> 绑定到服务。Android 系统随后调用服务的 <code>onBind()</code> 方法，该方法返回用于与服务交互的<code>IBinder</code>。<p></p>
+<p>绑定是异步的。<code>bindService()</code> 会立即返回，“不会”使<code>IBinder</code>返回客户端。要接收 <code>IBinder</code>，客户端必须创建一个 <code>ServiceConnection</code> 实例，并将其传递给 <code>bindService()</code>。<code>ServiceConnection</code> 包括一个回调方法，系统通过调用它来传递<code>IBinder</code>。</p>
+<blockquote>
+<p><strong>注</strong>：只有 Activity、服务和内容提供程序可以绑定到服务 — 您<strong>无法</strong>从广播接收器绑定到服务。</p>
+</blockquote>
+<p>因此，要想从您的客户端绑定到服务，您必须：<br>1.实现<code>ServiceConnection</code>。<br>  您的实现必须重写两个回调方法：<br>  <code>onServiceConnected()</code><br>    系统会调用该方法以传递服务的　onBind() 方法返回的 IBinder。</p>
+<p>  <code>onServiceDisconnected()</code><br>    Android 系统会在与服务的连接意外中断时（例如当服务崩溃或被终止时）调用该方法。当客户端取消绑定时，系统“不会”调用该方法。</p>
+<p>2.调用 <code>bindService()</code>，传递 <code>ServiceConnection</code> 实现。<br>3.当系统调用您的 <code>onServiceConnected()</code> 回调方法时，您可以使用接口定义的方法开始调用服务。<br>4.要断开与服务的连接，请调用 <code>unbindService()</code>。<br>  如果应用在客户端仍绑定到服务时销毁客户端，则销毁会导致客户端取消绑定。 更好的做法是在客户端与服务交互完成后立即取消绑定客户端。 这样可以关闭空闲服务。如需了解有关绑定和取消绑定的适当时机的详细信息，请参阅<a href="#Additional_Notes">附加说明</a>。</p>
+<p>例如，以下代码段通过<a href="#Binder">扩展 Binder 类</a>将客户端与上面创建的服务相连，因此它只需将返回的 <code>IBinder</code>转换为 <code>LocalService</code>类并请求 <code>LocalService</code> 实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">LocalService mService;</span><br><span class="line"><span class="keyword">private</span> ServiceConnection mConnection = <span class="keyword">new</span> ServiceConnection() &#123;</span><br><span class="line">    <span class="comment">// Called when the connection with the service is established</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName className, IBinder service)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Because we have bound to an explicit</span></span><br><span class="line">        <span class="comment">// service that is running in our own process, we can</span></span><br><span class="line">        <span class="comment">// cast its IBinder to a concrete class and directly access it.</span></span><br><span class="line">        LocalBinder binder = (LocalBinder) service;</span><br><span class="line">        mService = binder.getService();</span><br><span class="line">        mBound = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Called when the connection with the service disconnects unexpectedly</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName className)</span> </span>&#123;</span><br><span class="line">        Log.e(TAG, <span class="string">"onServiceDisconnected"</span>);</span><br><span class="line">        mBound = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>客户端可通过将此 <code>ServiceConnection</code> 传递至 <code>bindService()</code> 绑定到服务。例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, LocalService.class);</span><br><span class="line">bindService(intent, mConnection, Context.BIND_AUTO_CREATE);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>bindService()</code> 的第一个参数是一个 <code>Intent</code>，用于显式命名要绑定的服务（但 Intent 可能是隐式的）</li>
+<li>第二个参数是 <code>ServiceConnection</code> 对象</li>
+<li>第三个参数是一个指示绑定选项的标志。它通常应该是 <code>BIND_AUTO_CREATE</code>，以便创建尚未激活的服务。其他可能的值为 <code>BIND_DEBUG_UNBIND</code> 和 <code>BIND_NOT_FOREGROUND</code>，或 <code>0</code>（表示无）。</li>
+</ul>
+<p></p><h3 id="Additional_Notes">附加说明</h3><br>以下是一些有关绑定到服务的重要说明：<p></p>
+<ul>
+<li>您应该始终捕获 <code>DeadObjectException</code> 异常，它们是在连接中断时引发的。这是远程方法引发的唯一异常。</li>
+<li>对象是跨进程计数的引用。</li>
+<li>您通常应该在客户端生命周期的匹配引入 (bring-up) 和退出 (tear-down) 时刻期间配对绑定和取消绑定。 例如：<ul>
+<li>如果您只需要在 Activity 可见时与服务交互，则应在 onStart() 期间绑定，在 onStop() 期间取消绑定。</li>
+<li>如果您希望 Activity 在后台停止运行状态下仍可接收响应，则可在 onCreate() 期间绑定，在 onDestroy() 期间取消绑定。请注意，这意味着您的 Activity 在其整个运行过程中（甚至包括后台运行期间）都需要使用服务，因此如果服务位于其他进程内，那么当您提高该进程的权重时，系统终止该进程的可能性会增加。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>注</strong>：通常情况下，<strong>切勿</strong>在 Activity 的 <code>onResume()</code> 和 <code>onPause()</code> 期间绑定和取消绑定，因为每一次生命周期转换都会发生这些回调，您应该使发生在这些转换期间的处理保持在最低水平。此外，如果您的应用内的多个 Activity 绑定到同一服务，并且其中两个 Activity 之间发生了转换，则如果当前 Activity 在下一个 Activity 绑定（恢复期间）之前取消绑定（暂停期间），系统可能会销毁服务并重建服务。 （<a href="https://developer.android.com/guide/components/activities.html?hl=zh-cn#CoordinatingActivities" target="_blank" rel="noopener">Activity</a>文档中介绍了这种有关 Activity 如何协调其生命周期的 Activity 转换。）</p>
+</blockquote>
+<h2 id="管理绑定服务的生命周期"><a href="#管理绑定服务的生命周期" class="headerlink" title="管理绑定服务的生命周期"></a>管理绑定服务的生命周期</h2><p>当服务与所有客户端之间的绑定全部取消时，Android 系统便会销毁服务（除非还使用 <code>onStartCommand()</code> 启动了该服务）。因此，如果您的服务是纯粹的绑定服务，则无需对其生命周期进行管理 — Android 系统会根据它是否绑定到任何客户端代您管理。</p>
+<p>不过，如果您选择实现 <code>onStartCommand()</code> 回调方法，则您必须显式停止服务，因为系统现在已将服务视为<em>已启动</em>。在此情况下，服务将一直运行到其通过 <code>stopSelf()</code> 自行停止，或其他组件调用 <code>stopService()</code> 为止，无论其是否绑定到任何客户端。</p>
+<p>此外，如果您的服务已启动并接受绑定，则当系统调用您的 <code>onUnbind()</code> 方法时，如果您想在客户端下一次绑定到服务时接收 <code>onRebind()</code> 调用，则可选择返回 <code>true</code>。<code>onRebind()</code> 返回空值，但客户端仍在其 <code>onServiceConnected()</code> 回调中接收 <code>IBinder</code>。下图说明了这种生命周期的逻辑。</p>
+<p><img src="/posts/ccf7cf3d/service_binding_tree_lifecycle.png" alt="service_binding_tree_lifecycle"></p>
+<h2 id="其他知识"><a href="#其他知识" class="headerlink" title="其他知识"></a>其他知识</h2><h3 id="Messenger与AIDL的比较"><a href="#Messenger与AIDL的比较" class="headerlink" title="Messenger与AIDL的比较"></a>Messenger与AIDL的比较</h3><p>首先，在实现的难度上，肯定是<code>Messenger</code>要简单的多——至少不需要写AIDL文件了(虽然如果认真的究其本质，会发现它的底层实现还是AIDL)。另外，使用<code>Messenger</code>还有一个显著的好处是它会把所有的请求排入队列，因此你几乎可以不用担心多线程可能会带来的问题。</p>
+<p>但是这样说来，难道AIDL进行IPC就一无是处了么？当然不是，如果是那样的话它早就被淘汰了。一方面是如果项目中有并发处理问题的需求，或者会有大量的并发请求，这个时候Messenger就不适用了——它的特性让它只能串行的解决请求。另外，我们在使用Messenger的时候只能通过Message来传递信息实现交互，但是在有些时候也许我们需要直接跨进程调用服务端的方法，这个时候又怎么办呢？只能使用AIDL。</p>
+<p>所以，这两种IPC方式各有各的优点和缺点，具体使用哪种就看具体的需要了——当然，能使用简单的就尽量使用简单的吧。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://developer.android.com/guide/components/bound-services.html?hl=zh-cn" target="_blank" rel="noopener">Android Developers/Docs/指南/绑定服务</a></p>
+<p><a href="https://blog.csdn.net/luoyanglizi/article/details/51594016" target="_blank" rel="noopener">Android中的Service：Binder，Messenger，AIDL（2）</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+      <div>
+      <div>
+  
+    <div style="text-align:center;color: #ccc;font-size:16px;">------------- 本文结束 <i class="fa fa-smile-o"></i> 感谢您的阅读 -------------</div>
+  
+</div>
+
+      </div>
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/custom/wechatpay.jpg" alt="lingdage 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/custom/alipay.jpg" alt="lingdage 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script src="https://cdn.bootcss.com/jquery/2.0.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <p><span>本文标题:</span><a href="/posts/ccf7cf3d.html">Android Bound Service 知识总结</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 lingdage 的个人博客">lingdage</a></p>
+  <p><span>发布时间:</span>2019年03月25日 - 11:35</p>
+  <p><span>最后更新:</span>2019年03月28日 - 15:49</p>
+  <p><span>原始链接:</span><a href="/posts/ccf7cf3d.html" title="Android Bound Service 知识总结">https://lingdage.com/posts/ccf7cf3d.html</a>
+    <span class="copy-path" title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="https://lingdage.com/posts/ccf7cf3d.html" aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+</div>
+<script>
+    var clipboard = new Clipboard('.fa-clipboard');
+    $(".fa-clipboard").click(function(){
+      clipboard.on('success', function(){
+        swal({
+          title: "",
+          text: '复制成功',
+          icon: "success",
+          showConfirmButton: true
+          });
+	});
+    });
+</script>
+
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码/" rel="tag"><i class="fa fa-tag"></i> 源码</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+            
+              <div id="needsharebutton-postbottom">
+                <span class="btn">
+                  <i class="fa fa-share-alt" aria-hidden="true"></i>
+                </span>
+              </div>
+            
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/75909e64.html" rel="next" title="Android Service 知识总结">
+                <i class="fa fa-chevron-left"></i> Android Service 知识总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/96014b68.html" rel="prev" title="AsyncTask 源码分析">
+                AsyncTask 源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/custom/Linux_Tux.png" alt="lingdage">
+            
+              <p class="site-author-name" itemprop="name">lingdage</p>
+              <div class="site-description motion-element" itemprop="description">时间之事，最怕认真二字。</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lingdage" title="GitHub &rarr; https://github.com/lingdage" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础知识"><span class="nav-number">1.</span> <span class="nav-text">基础知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建绑定服务"><span class="nav-number">2.</span> <span class="nav-text">创建绑定服务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Binder"><span class="nav-number">2.1.</span> <span class="nav-text">扩展 Binder 类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-Messenger"><span class="nav-number">2.2.</span> <span class="nav-text">使用 Messenger</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-AIDL"><span class="nav-number">2.3.</span> <span class="nav-text">使用 AIDL</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Binding"><span class="nav-number">3.</span> <span class="nav-text">绑定到服务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Additional_Notes"><span class="nav-number">3.1.</span> <span class="nav-text">附加说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#管理绑定服务的生命周期"><span class="nav-number">4.</span> <span class="nav-text">管理绑定服务的生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他知识"><span class="nav-number">5.</span> <span class="nav-text">其他知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Messenger与AIDL的比较"><span class="nav-number">5.1.</span> <span class="nav-text">Messenger与AIDL的比较</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-hand-peace-o"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lingdage</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+      <div id="needsharebutton-float">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+      
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="//cdn.jsdelivr.net/gh/theme-next/theme-next-canvas-nest@1/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+  
+  <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.min.js"></script>
+
+  
+  <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.1/velocity.ui.min.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+  
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/valine/1.3.4/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'QiQFEXrz79fJQFo6MhLRdtje-gzGzoHsz',
+    appKey: 'C6GGTQU7p8kJ4vf6rlYzywbm',
+    placeholder: '留下你的小心心',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '20' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+  <script>
+    
+      pbOptions = {};
+      
+        pbOptions.iconStyle = "default";
+      
+        pbOptions.boxForm = "horizontal";
+      
+        pbOptions.position = "bottomCenter";
+      
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+      flOptions = {};
+      
+        flOptions.iconStyle = "default";
+      
+        flOptions.boxForm = "horizontal";
+      
+        flOptions.position = "middleRight";
+      
+        flOptions.networks = "Weibo,Wechat,Douban,QQZone,Twitter,Facebook";
+      
+      new needShareButton('#needsharebutton-float', flOptions);
+    
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
