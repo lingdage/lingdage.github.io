@@ -443,6 +443,251 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://lingdage.com/posts/e4e64342.html">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="lingdage">
+      <meta itemprop="description" content="汝果欲学诗，功夫在诗外。">
+      <meta itemprop="image" content="/images/custom/Linux_Tux.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="凌大哥@Android攻城狮">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/posts/e4e64342.html" class="post-title-link" itemprop="url">IntentService 源码分析</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-22 13:53:18" itemprop="dateCreated datePublished" datetime="2019-03-22T13:53:18+08:00">2019-03-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-03-27 22:35:17" itemprop="dateModified" datetime="2019-03-27T22:35:17+08:00">2019-03-27</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/技术随笔/" itemprop="url" rel="index"><span itemprop="name">技术随笔</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/posts/e4e64342.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/posts/e4e64342.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/posts/e4e64342.html" class="leancloud_visitors" data-flag-title="IntentService 源码分析">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">9.7k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">16 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <blockquote>
+<p><em>本文基于Android 9.0.0的源代码</em></p>
+</blockquote>
+<p><code>framework/base/core/java/andorid/app/IntentService.java</code></p>
+<h2 id="IntentService简介"><a href="#IntentService简介" class="headerlink" title="IntentService简介"></a>IntentService简介</h2><p><code>IntentService</code>是<code>Service</code>的子类，比普通的<code>Service</code>增加了额外的功能。先看<code>Service</code>本身存在两个问题：  </p>
+<ul>
+<li><code>Service</code>不会专门启动一条单独的进程，<code>Service</code>与它所在应用位于同一个进程中</li>
+<li><code>Service</code> 也不是一个线程,它和线程没有任何关系，所以它不能直接处理耗时操作。</li>
+</ul>
+<p><a href="https://lingdage.com/posts/75909e64.html"><code>Service</code></a>主要用来在后台进行任务处理，例如后台播放音乐、下载文件、上传文件等等。由于<code>Service</code>是运行在主线程中的，也有一定的时间限制，如果在主线程中对一个任务的处理时间超过了限制，进程就会出现“应用不响应”,即ANR, Application Not Responding。为了避免这样情况,一般都会在<code>Service</code>里用新的<code>thread</code>处理一些可能需要更多处理时间的任务。</p>
+<p>其实Android早就替我们设计了一种更方便的<code>Service + Thread</code>模式，就是本文要讲的<code>IntentService</code>，通过它可以很方便地实现在<code>Service</code>中使用<code>Thread</code>进行耗时任务的处理。</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/posts/e4e64342.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://lingdage.com/posts/b4da2c1c.html">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1385,255 +1630,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://lingdage.com/posts/ca9841f5.html">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="lingdage">
-      <meta itemprop="description" content="汝果欲学诗，功夫在诗外。">
-      <meta itemprop="image" content="/images/custom/Linux_Tux.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="凌大哥@Android攻城狮">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/posts/ca9841f5.html" class="post-title-link" itemprop="url">AOSP frameworks 源码环境搭建</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-02-28 13:25:24" itemprop="dateCreated datePublished" datetime="2019-02-28T13:25:24+08:00">2019-02-28</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-04-01 14:07:26" itemprop="dateModified" datetime="2019-04-01T14:07:26+08:00">2019-04-01</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/技术随笔/" itemprop="url" rel="index"><span itemprop="name">技术随笔</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-            
-                <span class="post-meta-item-text">评论数：</span>
-                <a href="/posts/ca9841f5.html#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/posts/ca9841f5.html" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-            <span id="/posts/ca9841f5.html" class="leancloud_visitors" data-flag-title="AOSP frameworks 源码环境搭建">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-            <div class="post-symbolscount">
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">本文字数：</span>
-                
-                <span title="本文字数">720</span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">1 分钟</span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>本文将记录最快捷的将framework层源码导入android studio进行源码分析的方法</p>
-<ul>
-<li><p>获取framework源码，这里使用清华大学的<a href="https://mirror.tuna.tsinghua.edu.cn/help/AOSP/" target="_blank" rel="noopener">镜像</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/WorkSpace/AOSP</span><br><span class="line">cd ~/WorkSpace/AOSP</span><br><span class="line">git clone -b android-9.0.0_r1 https://aosp.tuna.tsinghua.edu.cn/platform/frameworks/base platform/frameworks/ --depth 1</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>新建out文件夹 和 frameworks 同级</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ~/WorkSpace/AOSP/platform/frameworks</span><br><span class="line">mkdir -p ./out/host/linux-x86/framework</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>获取idegen.jar 并复制到 out/host/linux-x86/framework  下<br><a href="ca9841f5/idegen.jar">idegen.jar</a></p>
-</li>
-<li><p>获取idegen.sh </p>
-<ul>
-<li><p>clone development 到本地</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https://aosp.tuna.tsinghua.edu.cn/platform/development platform/development platform/</span><br><span class="line">development/tools/idegen/idegen.sh</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>或直接选择别人下好的idegen.sh<br><a href="ca9841f5/idegen.sh">idegen.sh</a><br>执行idegen.sh将会在～/WorkSpace/AOSP/platform/ 下生成android.iml 和 android.ipr 文件</p>
-</li>
-</ul>
-</li>
-<li>打开android studio 选择android.ipr 导入工程即可</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1682,7 +1678,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-count">12</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1730,7 +1726,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">5</span>
+                      
+                    
+                    <span class="site-state-item-count">6</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
