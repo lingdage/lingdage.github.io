@@ -15,7 +15,7 @@
 
 
 <html class="theme-next gemini use-motion" lang="zh-CN">
-<head><meta name="generator" content="Hexo 3.8.0">
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -576,7 +576,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">17k</span>
+                <span title="本文字数">37k</span>
               
 
               
@@ -590,7 +590,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">28 分钟</span>
+                <span title="阅读时长">1:02</span>
               
             </div>
           
@@ -620,6 +620,7 @@
 <p> <strong>注意：</strong>服务在其托管进程的主线程中运行，它既不创建自己的线程，也不在单独的进程中运行（除非另行指定）。 这意味着，如果服务将执行任何 CPU 密集型工作或阻止性操作（例如 MP3 播放或联网），则应在服务内创建新线程来完成这项工作。通过使用单独的线程，可以降低发生“应用无响应”(ANR) 错误的风险，而应用的主线程仍可继续专注于运行用户与 Activity 之间的交互。</p>
 </blockquote>
 <a id="more"></a>
+
 <p><code>Service</code>是一个可以在后台执行长时间操作而不使用用户界面的应用组件。那么问题来了，既然它不使用用户界面，那么它怎么知道应该什么时候开始执行什么操作呢？答案是——它可以与其他的引用组件形成一些联系，从而可以根据其传来的信息在合适的时候执行合适的操作。</p>
 <p>一般来讲，这种联系分为两种：<code>startService()</code>以及<code>bindService()</code>。这两种联系都可以使得一个<code>Service</code>开始运行，但是在其他方面有着诸多不同。</p>
 <table>
@@ -632,8 +633,7 @@
 <th><strong>service的生命周期</strong></th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>startService</td>
 <td>在其他组件中调用startService()方法后，服务即处于启动状态</td>
 <td>service中调用stopSelf()方法，或者其他组件调用stopService()方法后，service将停止运行</td>
@@ -647,8 +647,7 @@
 <td>可以通过 ServiceConnection进行通信，组件可以与service进行交互、发送请求、获取结果，甚至是利用IPC跨进程执行这些操作</td>
 <td>当所有与其绑定的组件都取消绑定(可能是组件被销毁也有可能是其调用了unbindService()方法)后，service将停止</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>注：<br>1.表格中的“其他组件”不包括<code>Broadcast receiver</code>，其不能bindService,但是可以startService的</p>
 <p>2.startService()与bindService()并不冲突，同一个service可能既有组件调用了startService()启动它，又有组件与它进行了绑定。当同一个service与其他组件同时存在这两种联系时，其生命周期会发生变化，必须<strong>从两种方法的角度看service均停止</strong>才能真正停止。</p>
 <h2 id="创建Service"><a href="#创建Service" class="headerlink" title="创建Service"></a>创建Service</h2><p>创建一个<code>Service</code>一般有下面2个步骤</p>
@@ -663,7 +662,9 @@
 <li>onBind()<br>当其他组件通过<code>bindService()</code>方法与<code>Service</code>相绑定之后，此方法将会被调用。这个方法有一个<code>IBinder</code>的返回值，这意味着在重写它的时候必须返回一个<code>IBinder</code>对象，它是用来支撑其他组件与<code>Service</code>之间的通信的——另外，如果你不想让这个<code>Service</code>被其他组件所绑定，可以通过在这个方法返回一个null值来实现。</li>
 <li>onDestroy()<br>这是<code>Service</code>一生中调用的最后一个方法，当这个方法被调用之后，<code>Service</code>就会被销毁。所以我们应当在这个方法里面进行一些资源的清理，比如注册的一些监听器什么的。</li>
 </ul>
-<p>在Manifests文件里进行声明的时候，只有android:name属性是必须要有的，其他的属性都可以没有。但是有的时候适当的配置可以让我们的开发进行地更加顺利，所以了解一下注册一个<code>Service</code>可以声明哪些属性也是很有必要的。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">service</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:enabled</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></span><br><span class="line"><span class="tag">    <span class="attr">android:exported</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></span><br><span class="line"><span class="tag">    <span class="attr">android:icon</span>=<span class="string">"drawable resource"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:isolatedProcess</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></span><br><span class="line"><span class="tag">    <span class="attr">android:label</span>=<span class="string">"string resource"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">"string"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:permission</span>=<span class="string">"string"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:process</span>=<span class="string">"string"</span> &gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>在Manifests文件里进行声明的时候，只有android:name属性是必须要有的，其他的属性都可以没有。但是有的时候适当的配置可以让我们的开发进行地更加顺利，所以了解一下注册一个<code>Service</code>可以声明哪些属性也是很有必要的。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">service</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:enabled</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></span><br><span class="line"><span class="tag">    <span class="attr">android:exported</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></span><br><span class="line"><span class="tag">    <span class="attr">android:icon</span>=<span class="string">"drawable resource"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:isolatedProcess</span>=<span class="string">[</span>"<span class="attr">true</span>" | "<span class="attr">false</span>"]</span></span><br><span class="line"><span class="tag">    <span class="attr">android:label</span>=<span class="string">"string resource"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:name</span>=<span class="string">"string"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:permission</span>=<span class="string">"string"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:process</span>=<span class="string">"string"</span> &gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
 <p>具体含义可参考<a href="https://developer.android.com/guide/topics/manifest/service-element.html?hl=zh-cn" target="_blank" rel="noopener">官网</a></p>
 <ul>
 <li>android:enabled : 如果为true，则这个<code>Service</code>可以被系统实例化，如果为false，则不行。默认为true</li>
@@ -676,6 +677,7 @@
 <li>android:process : <code>Service</code>运行的进程的name。默认启动的<code>Service</code>是运行在<strong>主进程</strong>中的。</li>
 </ul>
 <h3 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceDemo</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"ServiceDome"</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate();</span><br><span class="line">        Log.d(TAG, <span class="string">"onCreate"</span>);</span><br><span class="line">        <span class="comment">//只在service创建的时候调用一次，可以在此进行一些一次性的初始化操作</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">onStartCommand</span><span class="params">(Intent intent, <span class="keyword">int</span> flags, <span class="keyword">int</span> startId)</span> </span>&#123;</span><br><span class="line">        Log.d(TAG, <span class="string">"onStartCommand"</span>);</span><br><span class="line">        <span class="comment">//当其他组件调用startService()方法时，此方法将会被调用</span></span><br><span class="line">        <span class="comment">//在这里进行这个service主要的操作</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.onStartCommand(intent, flags, startId);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Nullable</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        Log.d(TAG, <span class="string">"onBind"</span>);</span><br><span class="line">        <span class="comment">//当其他组件调用bindService()方法时，此方法将会被调用</span></span><br><span class="line">        <span class="comment">//如果不想让这个service被绑定，在此返回null即可</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Log.d(TAG, <span class="string">"onDestroy"</span>);</span><br><span class="line">        <span class="comment">//service调用的最后一个方法</span></span><br><span class="line">        <span class="comment">//在此进行资源的回收</span></span><br><span class="line">        <span class="keyword">super</span>.onDestroy();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <blockquote>
 <p>注意:每个<code>Service</code>必须在<code>manifest</code>中 通过<service>来声明</service></p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="tag">&lt;<span class="name">service</span> <span class="attr">android:name</span>=<span class="string">"com.example.servicetest.ServiceDemo"</span> &gt;</span> </span><br><span class="line">&gt;   ... </span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
@@ -700,6 +702,7 @@
 <p>demo</p>
 <p>我们通过一个<code>Intent</code>对象，并调用<code>startService()</code>方法来启动<code>ServiceDemo</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Intent startIntent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, ServiceDemo.class);  </span><br><span class="line">startService(startIntent);</span><br></pre></td></tr></table></figure>
+
 <blockquote>
 <p> 注意,假如我们是通过点击<code>Button</code>执行上面的代码,那么第一次点击的时候回执行其中的<code>onCreate()</code>和<code>onStartCommand()</code>方法,但是当我们第二次点击的时候就只会执行<code>onStartCommand()</code>方法了.</p>
 <p>为什么会这样呢？<br>这是由于<code>onCreate()</code>方法只会在<code>Service</code>第一次被创建的时候调用，如果当前<code>Service</code>已经被创建过了(第一次点击创建了<code>ServiceDemo</code>)，不管怎样调用<code>startService()</code>方法，<code>onCreate()</code>方法都不会再执行。</p>
@@ -707,6 +710,7 @@
 <p>启动了之后,当我们想停止服务的时候该怎么做呢?</p>
 <p>我们也是通过一个<code>Intent</code>对象，并调用<code>stopService()</code>方法来停止<code>ServiceDemo</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Intent stopIntent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, ServiceDemo.class);</span><br><span class="line">stopService(stopIntent);</span><br></pre></td></tr></table></figure>
+
 <h2 id="停止Service"><a href="#停止Service" class="headerlink" title="停止Service"></a>停止Service</h2><p>启动服务必须管理自己的生命周期。也就是说，除非系统必须回收内存资源，否则系统不会停止或销毁服务，而且服务在<code>onStartCommand()</code> 返回后会继续运行。因此，服务必须通过调用 <code>stopSelf()</code> 自行停止运行，或者由另一个组件通过调用 <code>stopService()</code> 来停止它。</p>
 <p>一旦请求使用 <code>stopSelf()</code> 或 <code>stopService()</code> 停止服务，系统就会尽快销毁服务。</p>
 <p>但是，如果服务同时处理多个 <code>onStartCommand()</code> 请求，则您不应在处理完一个启动请求之后停止服务，因为您可能已经收到了新的启动请求（在第一个请求结束时停止服务会终止第二个请求）。为了避免这一问题，您可以使用<code>stopSelf(int)</code> 确保服务停止请求始终基于最近的启动请求。也就说，在调用 <code>stopSelf(int)</code> 时，传递与停止请求的 ID 对应的启动请求的 ID（传递给 <code>onStartCommand()</code> 的 <code>startId</code>）。然后，如果在您能够调用 <code>stopSelf(int)</code> 之前服务收到了新的启动请求，ID 就不匹配，服务也就不会停止。</p>
@@ -730,6 +734,7 @@
 <p>例如，应该将通过服务播放音乐的音乐播放器设置为在前台运行，这是因为用户明确意识到其操作。 状态栏中的通知可能表示正在播放的歌曲，并允许用户启动 Activity 来与音乐播放器进行交互。</p>
 <p>要请求让服务运行于前台，请调用 <code>startForeground()</code>。此方法采用两个参数：唯一标识通知的整型数和状态栏的<code>Notification</code>。例如：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Notification notification = <span class="keyword">new</span> Notification(R.drawable.icon, getText(R.string.ticker_text),</span><br><span class="line">        System.currentTimeMillis());</span><br><span class="line">Intent notificationIntent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, ExampleActivity.class);</span><br><span class="line">PendingIntent pendingIntent = PendingIntent.getActivity(<span class="keyword">this</span>, <span class="number">0</span>, notificationIntent, <span class="number">0</span>);</span><br><span class="line">notification.setLatestEventInfo(<span class="keyword">this</span>, getText(R.string.notification_title),</span><br><span class="line">        getText(R.string.notification_message), pendingIntent);</span><br><span class="line">startForeground(ONGOING_NOTIFICATION_ID, notification);</span><br></pre></td></tr></table></figure>
+
 <blockquote>
 <p> <strong>注意：</strong>提供给 <code>startForeground()</code> 的整型 ID 不得为 0。    </p>
 </blockquote>
@@ -749,6 +754,7 @@
 <p>这两条路径并非完全独立。也就是说，您可以绑定到已经使用 <code>startService()</code> 启动的服务。例如，可以通过使用<code>Intent</code>（标识要播放的音乐）调用 <code>startService()</code> 来启动后台音乐服务。随后，可能在用户需要稍加控制播放器或获取有关当前播放歌曲的信息时，Activity 可以通过调用 <code>bindService()</code> 绑定到服务。在这种情况下，除非所有客户端均取消绑定，否则 <code>stopService()</code> 或 <code>stopSelf()</code> 不会实际停止服务。</p>
 <h2 id="实现生命周期回调"><a href="#实现生命周期回调" class="headerlink" title="实现生命周期回调"></a>实现生命周期回调</h2><p>与 <code>Activity</code> 类似，服务也拥有生命周期回调方法，您可以实现这些方法来监控服务状态的变化并适时执行工作。 以下框架服务展示了每种生命周期方法：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExampleService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> mStartMode;       <span class="comment">// indicates how to behave if the service is killed</span></span><br><span class="line">    IBinder mBinder;      <span class="comment">// interface for clients that bind</span></span><br><span class="line">    <span class="keyword">boolean</span> mAllowRebind; <span class="comment">// indicates whether onRebind should be used</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// The service is being created</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">onStartCommand</span><span class="params">(Intent intent, <span class="keyword">int</span> flags, <span class="keyword">int</span> startId)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// The service is starting, due to a call to startService()</span></span><br><span class="line">        <span class="keyword">return</span> mStartMode;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// A client is binding to the service with bindService()</span></span><br><span class="line">        <span class="keyword">return</span> mBinder;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onUnbind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// All clients have unbound with unbindService()</span></span><br><span class="line">        <span class="keyword">return</span> mAllowRebind;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRebind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// A client is binding to the service with bindService(),</span></span><br><span class="line">        <span class="comment">// after onUnbind() has already been called</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// The service is no longer used and is being destroyed</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <blockquote>
 <p><strong>注：</strong>与 Activity 生命周期回调方法不同，您<em>不</em>需要调用这些回调方法的超类实现。</p>
 </blockquote>
@@ -795,80 +801,75 @@
 <h3 id="Service的种类"><a href="#Service的种类" class="headerlink" title="Service的种类"></a>Service的种类</h3><h4 id="按运行地点分类"><a href="#按运行地点分类" class="headerlink" title="按运行地点分类"></a><strong>按运行地点分类</strong></h4><table>
 <thead>
 <tr>
-<th style="text-align:center"><strong>类别</strong></th>
-<th style="text-align:center"><strong>区别</strong></th>
-<th style="text-align:center"><strong>优点</strong></th>
-<th style="text-align:center"><strong>缺点</strong></th>
-<th style="text-align:center"><strong>应用</strong></th>
+<th align="center"><strong>类别</strong></th>
+<th align="center"><strong>区别</strong></th>
+<th align="center"><strong>优点</strong></th>
+<th align="center"><strong>缺点</strong></th>
+<th align="center"><strong>应用</strong></th>
 </tr>
 </thead>
-<tbody>
-<tr>
-<td style="text-align:center">本地服务(Local)</td>
-<td style="text-align:center">该服务依附在主进程上</td>
-<td style="text-align:center">服务依附在主进程上而不是独立的进程，这样在一定程度上节约了资源，另外Local服务因为是在同一进程因此不需要IPC，也不需要AIDL。相应bindService会方便很多。</td>
-<td style="text-align:center">主进程被Kill后，服务便会终止。</td>
-<td style="text-align:center">非常常见的应用如：音乐播放服务。</td>
+<tbody><tr>
+<td align="center">本地服务(Local)</td>
+<td align="center">该服务依附在主进程上</td>
+<td align="center">服务依附在主进程上而不是独立的进程，这样在一定程度上节约了资源，另外Local服务因为是在同一进程因此不需要IPC，也不需要AIDL。相应bindService会方便很多。</td>
+<td align="center">主进程被Kill后，服务便会终止。</td>
+<td align="center">非常常见的应用如：音乐播放服务。</td>
 </tr>
 <tr>
-<td style="text-align:center">远程服务(Remote)</td>
-<td style="text-align:center">该服务是独立的进程</td>
-<td style="text-align:center">服务为独立的进程，对应进程名格式为所在包名加上你指定的android:process字符串。由于是独立的进程，因此在Activity所在进程被Kill的时候，该服务依然在运行，不受其他进程影响，有利于为多个进程提供服务具有较高的灵活性。</td>
-<td style="text-align:center">该服务是独立的进程，会占用一定资源，并且使用AIDL进行IPC稍微麻烦一点。</td>
-<td style="text-align:center">一些提供系统服务的Service，这种Service是常驻的。</td>
+<td align="center">远程服务(Remote)</td>
+<td align="center">该服务是独立的进程</td>
+<td align="center">服务为独立的进程，对应进程名格式为所在包名加上你指定的android:process字符串。由于是独立的进程，因此在Activity所在进程被Kill的时候，该服务依然在运行，不受其他进程影响，有利于为多个进程提供服务具有较高的灵活性。</td>
+<td align="center">该服务是独立的进程，会占用一定资源，并且使用AIDL进行IPC稍微麻烦一点。</td>
+<td align="center">一些提供系统服务的Service，这种Service是常驻的。</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <h4 id="按运行类型分类"><a href="#按运行类型分类" class="headerlink" title="按运行类型分类"></a>按运行类型分类</h4><table>
 <thead>
 <tr>
-<th style="text-align:center"><strong>类别</strong></th>
-<th style="text-align:center"><strong>区别</strong></th>
-<th style="text-align:center"><strong>应用</strong></th>
+<th align="center"><strong>类别</strong></th>
+<th align="center"><strong>区别</strong></th>
+<th align="center"><strong>应用</strong></th>
 </tr>
 </thead>
-<tbody>
-<tr>
-<td style="text-align:center">前台服务</td>
-<td style="text-align:center">会在通知一栏显示 ONGOING 的 Notification，</td>
-<td style="text-align:center">当服务被终止的时候，通知一栏的 Notification 也会消失，这样对于用户有一定的通知作用。常见的如音乐播放服务。</td>
+<tbody><tr>
+<td align="center">前台服务</td>
+<td align="center">会在通知一栏显示 ONGOING 的 Notification，</td>
+<td align="center">当服务被终止的时候，通知一栏的 Notification 也会消失，这样对于用户有一定的通知作用。常见的如音乐播放服务。</td>
 </tr>
 <tr>
-<td style="text-align:center">后台服务</td>
-<td style="text-align:center">默认的服务即为后台服务，即不会在通知一栏显示 ONGOING 的 Notification。</td>
-<td style="text-align:center">当服务被终止的时候，用户是看不到效果的。某些不需要运行或终止提示的服务，如天气更新，日期同步，邮件同步等。</td>
+<td align="center">后台服务</td>
+<td align="center">默认的服务即为后台服务，即不会在通知一栏显示 ONGOING 的 Notification。</td>
+<td align="center">当服务被终止的时候，用户是看不到效果的。某些不需要运行或终止提示的服务，如天气更新，日期同步，邮件同步等。</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>有同学可能会问，后台服务我们可以自己创建<code>ONGOING</code>的 <code>Notification</code> 这样就成为前台服务吗？答案是否定的，前台服务是在做了上述工作之后需要调用 <code>startForeground</code>（ android 2.0 及其以后版本 ）或 <code>setForeground</code>（android 2.0 以前的版本）使服务成为 前台服务。这样做的好处在于，当服务被外部强制终止掉的时候，<code>ONGOING</code> 的 <code>Notification</code>任然会移除掉。</p>
 <p>####　<strong>按使用方式分类</strong></p>
 <table>
 <thead>
 <tr>
-<th style="text-align:center">类别</th>
-<th style="text-align:center">区别</th>
+<th align="center">类别</th>
+<th align="center">区别</th>
 </tr>
 </thead>
-<tbody>
-<tr>
-<td style="text-align:center">startService 启动的服务</td>
-<td style="text-align:center">主要用于启动一个服务执行后台任务，不进行通信。停止服务使用stopService</td>
+<tbody><tr>
+<td align="center">startService 启动的服务</td>
+<td align="center">主要用于启动一个服务执行后台任务，不进行通信。停止服务使用stopService</td>
 </tr>
 <tr>
-<td style="text-align:center">bindService 启动的服务</td>
-<td style="text-align:center">该方法启动的服务要进行通信。停止服务使用unbindService</td>
+<td align="center">bindService 启动的服务</td>
+<td align="center">该方法启动的服务要进行通信。停止服务使用unbindService</td>
 </tr>
 <tr>
-<td style="text-align:center">startService 同时也 bindService 启动的服务</td>
-<td style="text-align:center">停止服务应同时使用stepService与unbindService</td>
+<td align="center">startService 同时也 bindService 启动的服务</td>
+<td align="center">停止服务应同时使用stepService与unbindService</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <blockquote>
-<p>特别注意:<br>1、你应当知道在调用 <code>bindService</code> 绑定到<code>Service</code>的时候，你就应当保证在某处调用 <code>unbindService</code> 解除绑定（尽管 <code>Activity</code>被 <code>finish</code> 的时候绑定会自动解除，并且<code>Service</code>会自动停止）；<br>2、你应当注意 使用<code>startService</code>启动服务之后，一定要使用 <code>stopService</code>停止服务，不管你是否使用<code>bindService</code>；<br>3、同时使用 <code>startService</code> 与 <code>bindService</code> 要注意到，<code>Service</code> 的终止，需要<code>unbindService</code>与<code>stopService</code>同时调用，才能终止 <code>Service</code>，不管 <code>startService</code> 与 <code>bindService</code> 的调用顺序，如果先调用 <code>unbindService</code> 此时服务不会自动终止，再调用 <code>stopService</code> 之后服务才会停止，如果先调用<code>stopService</code> 此时服务也不会终止，而再调用 <code>unbindService</code> 或者 之前调用 <code>bindService</code> 的 <code>Context</code>不存在了（如<code>Activity</code>被<code>finish</code> 的时候）之后服务才会自动停止；<br>4、当在旋转手机屏幕的时候，当手机屏幕在“横”“竖”变换时，此时如果你的 <strong>Activity</strong> 如果会自动旋转的话，旋转其实是 Activity 的重新创建，因此旋转之前的使用 bindService 建立的连接便会断开（<code>Context</code>不存在了），对应服务的生命周期与上述相同。<br>5、在 sdk 2.0 及其以后的版本中，对应的 <code>onStart</code> 已经被否决变为了 <code>onStartCommand</code>，不过之前的 <code>onStart</code> 任然有效。这意味着，如果你开发的应用程序用的 sdk 为 2.0 及其以后的版本，那么你应当使用<code>onStartCommand</code>而不是 <code>onStart</code>。</p>
+<p>特别注意:<br>1、你应当知道在调用 <code>bindService</code> 绑定到<code>Service</code>的时候，你就应当保证在某处调用 <code>unbindService</code> 解除绑定（尽管 <code>Activity</code>被 <code>finish</code> 的时候绑定会自动解除，并且<code>Service</code>会自动停止）；<br>2、你应当注意 使用<code>startService</code>启动服务之后，一定要使用 <code>stopService</code>停止服务，不管你是否使用<code>bindService</code>；
+3、同时使用 <code>startService</code> 与 <code>bindService</code> 要注意到，<code>Service</code> 的终止，需要<code>unbindService</code>与<code>stopService</code>同时调用，才能终止 <code>Service</code>，不管 <code>startService</code> 与 <code>bindService</code> 的调用顺序，如果先调用 <code>unbindService</code> 此时服务不会自动终止，再调用 <code>stopService</code> 之后服务才会停止，如果先调用<code>stopService</code> 此时服务也不会终止，而再调用 <code>unbindService</code> 或者 之前调用 <code>bindService</code> 的 <code>Context</code>不存在了（如<code>Activity</code>被<code>finish</code> 的时候）之后服务才会自动停止；<br>4、当在旋转手机屏幕的时候，当手机屏幕在“横”“竖”变换时，此时如果你的 <strong>Activity</strong> 如果会自动旋转的话，旋转其实是 Activity 的重新创建，因此旋转之前的使用 bindService 建立的连接便会断开（<code>Context</code>不存在了），对应服务的生命周期与上述相同。<br>5、在 sdk 2.0 及其以后的版本中，对应的 <code>onStart</code> 已经被否决变为了 <code>onStartCommand</code>，不过之前的 <code>onStart</code> 任然有效。这意味着，如果你开发的应用程序用的 sdk 为 2.0 及其以后的版本，那么你应当使用<code>onStartCommand</code>而不是 <code>onStart</code>。</p>
 </blockquote>
 <p>这两种启动方式生命周期可以参考<a href="https://www.jianshu.com/p/9ff1e04268c0" target="_blank" rel="noopener">Android Service本地服务详解</a></p>
-<h3 id="onStartCommand详解"><a href="#onStartCommand详解" class="headerlink" title="onStartCommand详解"></a>onStartCommand详解</h3><p>第一次调用<code>startService</code>方法时，<code>onCreate</code>方法、<code>onStartCommand`</code>方法将依次被调用，而多次调用startService<code>时，只有</code>onStartCommand<code>方法被调用，最后我们调用</code>stopService<code>方法停止服务时</code>onDestory<code>方法被回调，这就是启动状态下</code>Service`的执行周期。接着我们重新回过头来进一步分析onStartCommand（Intent intent, int flags, int startId），这个方法有3个传入参数，它们的含义如下：</p>
+<h3 id="onStartCommand详解"><a href="#onStartCommand详解" class="headerlink" title="onStartCommand详解"></a>onStartCommand详解</h3><p>第一次调用<code>startService</code>方法时，<code>onCreate</code>方法、<code>onStartCommand``方法将依次被调用，而多次调用startService</code>时，只有<code>onStartCommand</code>方法被调用，最后我们调用<code>stopService</code>方法停止服务时<code>onDestory</code>方法被回调，这就是启动状态下<code>Service</code>的执行周期。接着我们重新回过头来进一步分析onStartCommand（Intent intent, int flags, int startId），这个方法有3个传入参数，它们的含义如下：</p>
 <ul>
 <li><p>intent ：启动时，启动组件传递过来的Intent，如Activity可利用Intent封装所需要的参数并传递给Service</p>
 </li>

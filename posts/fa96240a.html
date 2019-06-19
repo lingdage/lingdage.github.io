@@ -15,7 +15,7 @@
 
 
 <html class="theme-next gemini use-motion" lang="zh-CN">
-<head><meta name="generator" content="Hexo 3.8.0">
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -580,7 +580,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">1.9k</span>
+                <span title="本文字数">5.7k</span>
               
 
               
@@ -594,7 +594,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">3 分钟</span>
+                <span title="阅读时长">9 分钟</span>
               
             </div>
           
@@ -616,6 +616,7 @@
       
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前一篇文章<a href="">AOSP 源码环境搭建</a>(<a href="https://lingdage.com/posts/8c9d1837.html)我们已经将AOSP整个源码down到了我们硬盘。接下来我们就要Read">https://lingdage.com/posts/8c9d1837.html)我们已经将AOSP整个源码down到了我们硬盘。接下来我们就要Read</a> The Fucking Source Code !</p>
 <a id="more"></a>
+
 <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>原理</p>
 <p>idegen专门为IDE环境调试源码而设计的工具，所以我们要将工程导入AS需要下面三个步骤</p>
 <ol>
@@ -626,11 +627,14 @@
 <p>不想编译整个AOSP源码的，对于idegen.jar以及idegen.sh 获取可以参考<a href="https://lingdage.com/posts/ca9841f5.html">AOSP frameworks 源码环境搭建</a></p>
 <p>下面讲下完整版的</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ～/aosp //具体的源码根目录</span><br><span class="line"></span><br><span class="line">//用于初始化环境变量</span><br><span class="line"><span class="built_in">source</span> build/envsetup.sh  	</span><br><span class="line"></span><br><span class="line">//生成文件out/host/linux-x86/framework/idegen.jar</span><br><span class="line">mmm development/tools/idegen/  </span><br><span class="line"></span><br><span class="line">//源码根目录生成文件android.ipr(工程相关设置), android.iml(模块相关配置)</span><br><span class="line">./development/tools/idegen/idegen.sh</span><br></pre></td></tr></table></figure>
+
 <blockquote>
 <p>m/mm/mmm/make 相关参考<a href="https://blog.csdn.net/Luoshengyang/article/details/19023609" target="_blank" rel="noopener">Android源代码编译命令m/mm/mmm/make分析</a></p>
 </blockquote>
 <h2 id="导入源码"><a href="#导入源码" class="headerlink" title="导入源码"></a>导入源码</h2><p>打开Android Studio， 点击<code>File</code> -&gt; <code>Open</code>，选中前面生成的<strong>android.ipr</strong>文件即可， 该过程较耗时</p>
-<h3 id="加载前配置文件提速"><a href="#加载前配置文件提速" class="headerlink" title="加载前配置文件提速"></a>加载前配置文件提速</h3><p>打开<code>android.iml</code>文件，有大量excludeFolder，是指不会导入到AS的模块，默认除了以下14个文件夹之外的所有文件都会导致到AS工程， 这显然还会非常庞大的，那么我们可以有选择的导入 如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">excludeFolder</span> <span class="attr">url</span>=<span class="string">"file://$MODULE_DIR$/.repo"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">excludeFolder</span> <span class="attr">url</span>=<span class="string">"file://$MODULE_DIR$/external/bluetooth"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">excludeFolder</span> <span class="attr">url</span>=<span class="string">"file://$MODULE_DIR$/frameworks/base/docs"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">excludeFolder</span> <span class="attr">url</span>=<span class="string">"file://$MODULE_DIR$/out/host"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">excludeFolder</span> <span class="attr">url</span>=<span class="string">"file://$MODULE_DIR$/prebuilt"</span>/&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="加载前配置文件提速"><a href="#加载前配置文件提速" class="headerlink" title="加载前配置文件提速"></a>加载前配置文件提速</h3><p>打开<code>android.iml</code>文件，有大量excludeFolder，是指不会导入到AS的模块，默认除了以下14个文件夹之外的所有文件都会导致到AS工程， 这显然还会非常庞大的，那么我们可以有选择的导入 如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">excludeFolder</span> <span class="attr">url</span>=<span class="string">"file://$MODULE_DIR$/.repo"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">excludeFolder</span> <span class="attr">url</span>=<span class="string">"file://$MODULE_DIR$/external/bluetooth"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">excludeFolder</span> <span class="attr">url</span>=<span class="string">"file://$MODULE_DIR$/frameworks/base/docs"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">excludeFolder</span> <span class="attr">url</span>=<span class="string">"file://$MODULE_DIR$/out/host"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">excludeFolder</span> <span class="attr">url</span>=<span class="string">"file://$MODULE_DIR$/prebuilt"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
 <h3 id="加载后提速"><a href="#加载后提速" class="headerlink" title="加载后提速"></a>加载后提速</h3><p>如果已经把全部项目导入到Android Studio，又想删除怎么办，其实有一个简单的方法就是进入目录<code>Project Structure</code> -&gt; <code>Modules</code>， 可快速去除某些模块, 其中红色代码Exclueded选项(即代表已删除的目录), 如下图: <img src="/posts/fa96240a/as_excluded_modules.png" alt="as_modules"></p>
 <h3 id="配置源码正确跳转"><a href="#配置源码正确跳转" class="headerlink" title="配置源码正确跳转"></a>配置源码正确跳转</h3><p>这里的配置JDK/SDK，是用于解决在分析和调试源码的过程，能正确地跳转到目标源码，而非SDK中的代码。 点击<code>File</code>菜单下的<code>Project Structure</code>.</p>
 <h4 id="新建JDK-No-Libraries"><a href="#新建JDK-No-Libraries" class="headerlink" title="新建JDK(No Libraries)"></a>新建JDK(No Libraries)</h4><ol>

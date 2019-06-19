@@ -15,7 +15,7 @@
 
 
 <html class="theme-next gemini use-motion" lang="zh-CN">
-<head><meta name="generator" content="Hexo 3.8.0">
+<head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -575,7 +575,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">9.7k</span>
+                <span title="本文字数">30k</span>
               
 
               
@@ -589,7 +589,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">16 分钟</span>
+                <span title="阅读时长">50 分钟</span>
               
             </div>
           
@@ -820,7 +820,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">5.1k</span>
+                <span title="本文字数">17k</span>
               
 
               
@@ -834,7 +834,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">9 分钟</span>
+                <span title="阅读时长">29 分钟</span>
               
             </div>
           
@@ -859,7 +859,9 @@
 <p> <em>本文基于Android 9.0.0的源代码</em></p>
 </blockquote>
 <p><code>framework/base/core/java/andorid/os/HandlerThread.java</code></p>
-<h2 id="使用简介"><a href="#使用简介" class="headerlink" title="使用简介"></a>使用简介</h2><p>在<a href="https://lingdage.com/posts/20470e2e.html">Handler源码分析</a>中我们提到,在子线程中创建<code>Handler</code>,要手动调用<code>Looper.prepare()</code>,创建的过程大致如下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Handler mHandler;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createManualThreadWithHandler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">new</span> Thread() &#123;</span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.run();</span><br><span class="line">            Looper.prepare();</span><br><span class="line">            mHandler = <span class="keyword">new</span> Handler(Looper.myLooper());</span><br><span class="line">            Looper.loop();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="使用简介"><a href="#使用简介" class="headerlink" title="使用简介"></a>使用简介</h2><p>在<a href="https://lingdage.com/posts/20470e2e.html">Handler源码分析</a>中我们提到,在子线程中创建<code>Handler</code>,要手动调用<code>Looper.prepare()</code>,创建的过程大致如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Handler mHandler;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createManualThreadWithHandler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">new</span> Thread() &#123;</span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.run();</span><br><span class="line">            Looper.prepare();</span><br><span class="line">            mHandler = <span class="keyword">new</span> Handler(Looper.myLooper());</span><br><span class="line">            Looper.loop();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>Android为了简化<code>Handler</code>的创建过程提供了一个便捷的类，使用它我们可以快速的创建一个带有<code>Looper</code>的线程，有了<code>Looper</code>这个线程，我们就可以生成<code>Handler</code>。</p>
           <!--noindex-->
           
@@ -1060,7 +1062,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">29k</span>
+                <span title="本文字数">90k</span>
               
 
               
@@ -1074,7 +1076,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">48 分钟</span>
+                <span title="阅读时长">2:30</span>
               
             </div>
           
@@ -1099,6 +1101,7 @@
 <p><em>本文基于Android 9.0.0的源代码，来分析Handler的用法</em></p>
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">framework/base/core/java/andorid/os/</span><br><span class="line">  - Handler.java</span><br><span class="line">  - Looper.java</span><br><span class="line">  - Message.java</span><br><span class="line">  - MessageQueue.java</span><br></pre></td></tr></table></figure>
+
 <h2 id="Handler作用"><a href="#Handler作用" class="headerlink" title="Handler作用"></a>Handler作用</h2><ul>
 <li>任务调度：即通过 <code>post()</code> 和 <code>send()</code> 等方法来指定某个任务在某个时间执行</li>
 <li>线程切换：执行耗时的操作，比如网络请求，IO操作等，需要在子线程中运行，不然会阻塞主线程。<br>而执行完网络请求等耗时操作后通常需要更新UI，如果在子线程中更新UI，那么程序会崩溃。因为Android的UI是线程不安全的。 在Android中使用Rxjava，还要配合RxAndroid来使用，RxAndroid 内部就使用 Handler 来实现线程切换。</li>
@@ -1302,7 +1305,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">1.9k</span>
+                <span title="本文字数">5.7k</span>
               
 
               
@@ -1316,7 +1319,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">3 分钟</span>
+                <span title="阅读时长">9 分钟</span>
               
             </div>
           
@@ -1537,7 +1540,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">5.3k</span>
+                <span title="本文字数">18k</span>
               
 
               
@@ -1551,7 +1554,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">9 分钟</span>
+                <span title="阅读时长">30 分钟</span>
               
             </div>
           
@@ -1572,7 +1575,7 @@
 
       
         
-          <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="配置Android-Studio"><a href="#配置Android-Studio" class="headerlink" title="配置Android Studio"></a>配置Android Studio</h3><p><strong>调整内存大小: </strong> Android Studio需要大量的内存来加载Android源码，所以经常会遇到内存不足的问题, 需要加大内存. 点击<code>Help</code>-&gt; <code>Edit Custom VM Options</code>, 比如 “-Xms4096m -Xmx4096m”</p>
+          <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="配置Android-Studio"><a href="#配置Android-Studio" class="headerlink" title="配置Android Studio"></a>配置Android Studio</h3><p>*<em>调整内存大小: *</em> Android Studio需要大量的内存来加载Android源码，所以经常会遇到内存不足的问题, 需要加大内存. 点击<code>Help</code>-&gt; <code>Edit Custom VM Options</code>, 比如 “-Xms4096m -Xmx4096m”</p>
 <p>更多资料:</p>
 <ul>
 <li><a href="https://developer.android.com/studio/index.html" target="_blank" rel="noopener">Android Studio官网</a></li>
